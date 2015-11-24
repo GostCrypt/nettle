@@ -1,0 +1,20 @@
+language: c
+sudo: false
+compiler:
+  - gcc
+  - clang
+os: linux
+addons:
+  apt:
+    packages:
+      - libgmp-dev
+      - libssl-dev
+
+env:
+  matrix:
+    - MINIGMP=no
+    - MINIGMP=yes
+
+before_script:
+  - autoreconf -vfi
+script: ./configure --enable-mini-gmp=${MINIGMP} && make && make check
