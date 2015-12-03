@@ -1,6 +1,8 @@
-/* nettle-meta-hashes.c
+/* hmac-streebog.c
 
-   Copyright (C) 2011 Daniel Kahn Gillmor
+   HMAC-Streebog message authentication code.
+
+   Copyright (C) 2016 Dmitry Eremin-Solenikov
 
    This file is part of GNU Nettle.
 
@@ -33,34 +35,39 @@
 # include "config.h"
 #endif
 
-#include <stddef.h>
+#include "hmac.h"
 
-#include "nettle-meta.h"
-
-const struct nettle_hash * const _nettle_hashes[] = {
-  &nettle_gosthash94,
-  &nettle_gosthash94cp,
-  &nettle_md2,
-  &nettle_md4,
-  &nettle_md5,
-  &nettle_gosthash94,
-  &nettle_ripemd160,
-  &nettle_sha1,
-  &nettle_sha224,
-  &nettle_sha256,
-  &nettle_sha384,
-  &nettle_sha512,
-  &nettle_sha3_224,
-  &nettle_sha3_256,
-  &nettle_sha3_384,
-  &nettle_sha3_512,
-  &nettle_streebog256,
-  &nettle_streebog512,
-  NULL
-};
-
-const struct nettle_hash * const *
-nettle_get_hashes (void)
+void
+hmac_streebog512_set_key(struct hmac_streebog512_ctx *ctx,
+		    size_t key_length, const uint8_t *key)
 {
-  return _nettle_hashes;
+  HMAC_SET_KEY(ctx, &nettle_streebog512, key_length, key);
+}
+
+void
+hmac_streebog512_update(struct hmac_streebog512_ctx *ctx,
+		   size_t length, const uint8_t *data)
+{
+  streebog512_update(&ctx->state, length, data);
+}
+
+void
+hmac_streebog512_digest(struct hmac_streebog512_ctx *ctx,
+		   size_t length, uint8_t *digest)
+{
+  HMAC_DIGEST(ctx, &nettle_streebog512, length, digest);
+}
+
+void
+hmac_streebog256_set_key(struct hmac_streebog256_ctx *ctx,
+		    size_t key_length, const uint8_t *key)
+{
+  HMAC_SET_KEY(ctx, &nettle_streebog256, key_length, key);
+}
+
+void
+hmac_streebog256_digest(struct hmac_streebog256_ctx *ctx,
+		   size_t length, uint8_t *digest)
+{
+  HMAC_DIGEST(ctx, &nettle_streebog256, length, digest);
 }
