@@ -10,6 +10,7 @@ const char* hashes[] = {
   "md2",
   "md4",
   "md5",
+  "gosthash94",
   "ripemd160",
   "sha1",
   "sha224",
