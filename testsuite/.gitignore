@@ -43,6 +43,9 @@
 /eddsa-verify-test
 /gcm-test
 /gost28147-test
+/gostdsa-keygen-test
+/gostdsa-sign-test
+/gostdsa-verify-test
 /gosthash94-test
 /hkdf-test
 /hmac-test

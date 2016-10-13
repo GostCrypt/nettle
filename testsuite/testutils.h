@@ -22,6 +22,7 @@
 # include "ecc.h"
 # include "ecc-internal.h"
 # include "ecdsa.h"
+# include "gostdsa.h"
 # include "gmp-glue.h"
 # if NETTLE_USE_MINI_GMP
 #  include "knuth-lfib.h"

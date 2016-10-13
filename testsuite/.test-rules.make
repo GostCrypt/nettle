@@ -286,6 +286,15 @@ eddsa-verify-test$(EXEEXT): eddsa-verify-test.$(OBJEXT)
 ed25519-test$(EXEEXT): ed25519-test.$(OBJEXT)
 	$(LINK) ed25519-test.$(OBJEXT) $(TEST_OBJS) -o ed25519-test$(EXEEXT)
 
+gostdsa-sign-test$(EXEEXT): gostdsa-sign-test.$(OBJEXT)
+	$(LINK) gostdsa-sign-test.$(OBJEXT) $(TEST_OBJS) -o gostdsa-sign-test$(EXEEXT)
+
+gostdsa-verify-test$(EXEEXT): gostdsa-verify-test.$(OBJEXT)
+	$(LINK) gostdsa-verify-test.$(OBJEXT) $(TEST_OBJS) -o gostdsa-verify-test$(EXEEXT)
+
+gostdsa-keygen-test$(EXEEXT): gostdsa-keygen-test.$(OBJEXT)
+	$(LINK) gostdsa-keygen-test.$(OBJEXT) $(TEST_OBJS) -o gostdsa-keygen-test$(EXEEXT)
+
 sha1-huge-test$(EXEEXT): sha1-huge-test.$(OBJEXT)
 	$(LINK) sha1-huge-test.$(OBJEXT) $(TEST_OBJS) -o sha1-huge-test$(EXEEXT)
 

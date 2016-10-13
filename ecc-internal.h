@@ -53,6 +53,7 @@
 #define ecc_mod _nettle_ecc_mod
 #define ecc_mod_inv _nettle_ecc_mod_inv
 #define ecc_hash _nettle_ecc_hash
+#define gost_hash _nettle_gost_hash
 #define ecc_a_to_j _nettle_ecc_a_to_j
 #define ecc_j_to_a _nettle_ecc_j_to_a
 #define ecc_eh_to_a _nettle_ecc_eh_to_a
@@ -280,6 +281,11 @@ ecc_hash (const struct ecc_modulo *m,
 	  mp_limb_t *hp,
 	  size_t length, const uint8_t *digest);
 
+void
+gost_hash (const struct ecc_modulo *m,
+	  mp_limb_t *hp,
+	  size_t length, const uint8_t *digest);
+
 /* Converts a point P in affine coordinates into a point R in jacobian
    coordinates. */
 void
@@ -420,6 +426,7 @@ curve25519_eh_to_x (mp_limb_t *xp, const mp_limb_t *p,
   (((3 << ECC_MUL_A_EH_WBITS) + 10) * (size))
 #endif
 #define ECC_ECDSA_SIGN_ITCH(size) (12*(size))
+#define ECC_GOSTDSA_SIGN_ITCH(size) (12*(size))
 #define ECC_MOD_RANDOM_ITCH(size) (size)
 #define ECC_HASH_ITCH(size) (1+(size))
 
