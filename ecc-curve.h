@@ -48,6 +48,11 @@ const struct ecc_curve * _NETTLE_ATTRIBUTE_PURE nettle_get_secp_224r1(void);
 const struct ecc_curve * _NETTLE_ATTRIBUTE_PURE nettle_get_secp_256r1(void);
 const struct ecc_curve * _NETTLE_ATTRIBUTE_PURE nettle_get_secp_384r1(void);
 const struct ecc_curve * _NETTLE_ATTRIBUTE_PURE nettle_get_secp_521r1(void);
+const struct ecc_curve * _NETTLE_ATTRIBUTE_PURE nettle_get_gost_256cpa(void);
+const struct ecc_curve * _NETTLE_ATTRIBUTE_PURE nettle_get_gost_256cpb(void);
+const struct ecc_curve * _NETTLE_ATTRIBUTE_PURE nettle_get_gost_256cpc(void);
+const struct ecc_curve * _NETTLE_ATTRIBUTE_PURE nettle_get_gost_512a(void);
+const struct ecc_curve * _NETTLE_ATTRIBUTE_PURE nettle_get_gost_512b(void);
 
 #ifdef __cplusplus
 }

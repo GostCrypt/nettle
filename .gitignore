@@ -49,6 +49,11 @@ core
 /ecc-384.h
 /ecc-521.h
 /ecc-25519.h
+/ecc-gost256cpa.h
+/ecc-gost256cpb.h
+/ecc-gost256cpc.h
+/ecc-gost512a.h
+/ecc-gost512b.h
 /version.h
 /nettle.aux
 /nettle.cp

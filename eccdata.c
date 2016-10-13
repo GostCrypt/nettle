@@ -345,11 +345,9 @@ ecc_curve_init_str (struct ecc_curve *ecc, enum ecc_type type,
 }
 
 static void
-ecc_curve_init (struct ecc_curve *ecc, unsigned bit_size)
+ecc_curve_init (struct ecc_curve *ecc, const char *curve)
 {
-  switch (bit_size)
-    {
-    case 192:      
+  if (!strcmp(curve, "secp192r1")) {
       ecc_curve_init_str (ecc, ECC_TYPE_WEIERSTRASS,
 			  /* p = 2^{192} - 2^{64} - 1 */
 			  "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE"
@@ -380,8 +378,7 @@ ecc_curve_init (struct ecc_curve *ecc, unsigned bit_size)
 		   "35433907297cc378b0015703374729d7a4fe46647084e4ba",
 		   "a2649984f2135c301ea3acb0776cd4f125389b311db3be32");
 
-      break;
-    case 224:
+  } else if (!strcmp(curve, "secp224r1")) {
       ecc_curve_init_str (ecc, ECC_TYPE_WEIERSTRASS,
 			  /* p = 2^{224} - 2^{96} + 1 */
 			  "ffffffffffffffffffffffffffffffff"
@@ -413,8 +410,7 @@ ecc_curve_init (struct ecc_curve *ecc, unsigned bit_size)
 		   "ae99feebb5d26945b54892092a8aee02912930fa41cd114e40447301",
 		   "482580a0ec5bc47e88bc8c378632cd196cb3fa058a7114eb03054c9");
 
-      break;
-    case 256:
+  } else if (!strcmp(curve, "secp256r1")) {
       ecc_curve_init_str (ecc, ECC_TYPE_WEIERSTRASS,
 			  /* p = 2^{256} - 2^{224} + 2^{192} + 2^{96} - 1 */
 			  "FFFFFFFF000000010000000000000000"
@@ -446,8 +442,7 @@ ecc_curve_init (struct ecc_curve *ecc, unsigned bit_size)
 		   "e2534a3532d08fbba02dde659ee62bd0031fe2db785596ef509302446b030852",
 		   "e0f1575a4c633cc719dfee5fda862d764efc96c3f30ee0055c42c23f184ed8c6");
 
-      break;
-    case 384:
+  } else if (!strcmp(curve, "secp384r1")) {
       ecc_curve_init_str (ecc, ECC_TYPE_WEIERSTRASS,
 			  /* p = 2^{384} - 2^{128} - 2^{96} + 2^{32} - 1 */
 			  "ffffffffffffffffffffffffffffffff"
@@ -484,8 +479,7 @@ ecc_curve_init (struct ecc_curve *ecc, unsigned bit_size)
 		   "138251cd52ac9298c1c8aad977321deb97e709bd0b4ca0aca55dc8ad51dcfc9d1589a1597e3a5120e1efd631c63e1835",
 		   "cacae29869a62e1631e8a28181ab56616dc45d918abc09f3ab0e63cf792aa4dced7387be37bba569549f1c02b270ed67");
 
-      break;
-    case 521:
+  } else if (!strcmp (curve, "secp521r1")) {
       ecc_curve_init_str (ecc, ECC_TYPE_WEIERSTRASS,
 			  "1ff" /* p = 2^{521} - 1 */
 			  "ffffffffffffffffffffffffffffffff"
@@ -531,8 +525,7 @@ ecc_curve_init (struct ecc_curve *ecc, unsigned bit_size)
 		   "35b5df64ae2ac204c354b483487c9070cdc61c891c5ff39afc06c5d55541d3ceac8659e24afe3d0750e8b88e9f078af066a1d5025b08e5a5e2fbc87412871902f3",
 		   "82096f84261279d2b673e0178eb0b4abb65521aef6e6e32e1b5ae63fe2f19907f279f283e54ba385405224f750a95b85eebb7faef04699d1d9e21f47fc346e4d0d");
 
-      break;
-    case 255:
+  } else if (!strcmp(curve, "curve25519")) {
       /* curve25519, y^2 = x^3 + 486662 x^2 + x (mod p), with p = 2^{255} - 19.
 
 	 According to http://cr.yp.to/papers.html#newelliptic, this
@@ -602,13 +595,157 @@ ecc_curve_init (struct ecc_curve *ecc, unsigned bit_size)
 		   "75af5bf4ebdc75c8fe26873427d275d7"
 		   "3c0fb13da361077a565539f46de1c30");
 
-      break;
+  } else if (!strcmp(curve, "gost-256cpa")) {
+      ecc_curve_init_str (ecc, ECC_TYPE_WEIERSTRASS,
+					"ffffffffffffffffffffffffffffffff"
+					"fffffffffffffffffffffffffffffd97",
 
-    default:
-      fprintf (stderr, "No known curve for size %d\n", bit_size);
+					"00000000000000000000000000000000"
+					"000000000000000000000000000000a6",
+
+					"ffffffffffffffffffffffffffffffff"
+					"6c611070995ad10045841b09b761b893",
+
+					"00000000000000000000000000000000"
+					"00000000000000000000000000000001",
+
+					"8d91e471e0989cda27df505a453f2b76"
+					"35294f2ddf23e3b122acc99c9e9f1e14",
+					NULL, NULL);
+
+      ecc->ref = ecc_alloc (3);
+      ecc_set_str (&ecc->ref[0], /* 2 g */
+		   "fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffd95",
+		   "726e1b8e1f676325d820afa5bac0d489cad6b0d220dc1c4edd5336636160df83");
+
+      ecc_set_str (&ecc->ref[1], /* 3 g */
+		   "8e38e38e38e38e38e38e38e38e38e38e38e38e38e38e38e38e38e38e38e38d2c",
+		   "76bcd1ca9a23b041d4d9baf507a6cd821267a94c838768e8486117796b788a51");
+
+      ecc_set_str (&ecc->ref[2], /* 4 g */
+		   "f7063e7063e7063e7063e7063e7063e7063e7063e7063e7063e7063e7063e4b7",
+		   "83ccf17ba6706d73625cc3534c7a2b9d6ec1ee6a9a7e07c10d84b388de59f741");
+
+  } else if (!strcmp(curve, "gost-256cpb")) {
+      ecc_curve_init_str (ecc, ECC_TYPE_WEIERSTRASS,
+					"80000000000000000000000000000000"
+					"00000000000000000000000000000c99",
+
+					"3e1af419a269a5f866a7d3c25c3df80a"
+					"e979259373ff2b182f49d4ce7e1bbc8b",
+
+					"80000000000000000000000000000001"
+					"5f700cfff1a624e5e497161bcc8a198f",
+
+					"00000000000000000000000000000000"
+					"00000000000000000000000000000001",
+
+					"3fa8124359f96680b83d1c3eb2c070e5"
+					"c545c9858d03ecfb744bf8d717717efc",
+					NULL, NULL);
+
+      ecc->ref = ecc_alloc (3);
+      ecc_set_str (&ecc->ref[0], /* 2 g */
+		   "8000000000000000000000000000000000000000000000000000000000000c97",
+		   "4057edbca606997f47c2e3c14d3f8f1a3aba367a72fc13048bb40728e88e8d9d");
+
+      ecc_set_str (&ecc->ref[1], /* 3 g */
+		   "1b9a33999d8449c3bbd8cfe49ac6355a2ee0827a6c71687c86cb7b0670efe205",
+		   "1876d998a19da37a120e76cb42f4f5225197279b612f712171a4648fe4a3ff12");
+
+      ecc_set_str (&ecc->ref[2], /* 4 g */
+		   "5fa13ecfadd7ae00c2e65d0ac6cac1deda6d60e577afe90915671b08bbb9065e",
+		   "1b3c2859166129ac6dafee570ab9d40d33fdc25c7253c72f4e3fa77223ab016a");
+
+  } else if (!strcmp(curve, "gost-256cpc")) {
+      ecc_curve_init_str (ecc, ECC_TYPE_WEIERSTRASS,
+					"9b9f605f5a858107ab1ec85e6b41c8aa"
+					"cf846e86789051d37998f7b9022d759b",
+
+					"00000000000000000000000000000000"
+					"0000000000000000000000000000805a",
+
+					"9b9f605f5a858107ab1ec85e6b41c8aa"
+					"582ca3511eddfb74f02f3a6598980bb9",
+
+					"00000000000000000000000000000000"
+					"00000000000000000000000000000000",
+
+					"41ece55743711a8c3cbf3783cd08c0ee"
+					"4d4dc440d4641a8f366e550dfdb3bb67",
+					NULL, NULL);
+      ecc->ref = ecc_alloc (3);
+      ecc_set_str (&ecc->ref[0], /* 2 g */
+		   "74ab1ac14e9ed5cda1af70308c897ebf3d91d913a7bf377833c436bf0f8aa40e",
+		   "7d223beab738ba52a65ffbfe585d2807bfaed5ea9cd651a63a775b4182f562e3");
+
+      ecc_set_str (&ecc->ref[1], /* 3 g */
+		   "771e56689775fda0bbdeac54e9cd379f30391edf06f335269c48f06446cd037a",
+		   "8430215fbee8a09c5e38bda64b50bbef41392d6afa5ced73652c83cb5221d02b");
+
+      ecc_set_str (&ecc->ref[2], /* 4 g */
+		   "4fe44356aded59b4b661e9da15fe79dbcb1d7346770919c5c99090e5ae4db8a6",
+		   "24f0222027a3d2577cca5aefb5411c88f92f5f4b8febddebc71c12180640ebfd");
+
+  } else if (!strcmp(curve, "gost-512a")) {
+      ecc_curve_init_str (ecc, ECC_TYPE_WEIERSTRASS,
+					"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+					"fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffdc7",
+					"e8c2505dedfc86ddc1bd0b2b6667f1da34b82574761cb0e879bd081cfd0b6265"
+					"ee3cb090f30d27614cb4574010da90dd862ef9d4ebee4761503190785a71c760",
+					"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+					"27e69532f48d89116ff22b8d4e0560609b4b38abfad2b85dcacdb1411f10b275",
+					"0000000000000000000000000000000000000000000000000000000000000000"
+					"0000000000000000000000000000000000000000000000000000000000000003",
+					"7503cfe87a836ae3a61b8816e25450e6ce5e1c93acf1abc1778064fdcbefa921"
+					"df1626be4fd036e93d75e6a50e3a41e98028fe5fc235f5b889a589cb5215f2a4",
+					NULL, NULL);
+
+      ecc->ref = ecc_alloc (3);
+      ecc_set_str (&ecc->ref[0], /* 2 g */
+		   "3b89dcfc622996ab97a5869dbff15cf51db00954f43a58a5e5f6b0470a132b2f4434bbcd405d2a9516151d2a6a04f2e4375bf48de1fdb21fb982afd9d2ea137c",
+		   "c813c4e2e2e0a8a391774c7903da7a6f14686e98e183e670ee6fb784809a3e92ca209dc631d85b1c7534ed3b37fddf64d854d7e01f91f18bb3fd307591afc051");
+
+      ecc_set_str (&ecc->ref[1], /* 3 g */
+		   "a1ff1ab2712a267eb53935ddb5a567f84db156cc096168a1174291d5f488fba543d2840b4d2dd35d764b2f57b308907aec55cfba10544e8416e134687ccb87c3",
+		   "3cb5c4417ec4637f30374f189bb5b984c41e3a48d7f84fbfa3819e3f333f7eb311d3af7e67c4c16eeacfac2fe94c6dd4c6366f711a4fb6c7125cd7ec518d90d6");
+
+      ecc_set_str (&ecc->ref[2], /* 4 g */
+		   "b7bfb80956c8670031ba191929f64e301d681634236d47a60e571a4bedc0ef257452ef78b5b98dbb3d9f3129d9349433ce2a3a35cb519c91e2d633d7b373ae16",
+		   "3bee95e29eecc5d5ad2beba941abcbf9f1cad478df0fecf614f63aeebef77850da7efdb93de8f3df80bc25eac09239c14175f5c29704ce9a3e383f1b3ec0e929");
+
+  } else if (!strcmp(curve, "gost-512b")) {
+      ecc_curve_init_str (ecc, ECC_TYPE_WEIERSTRASS,
+					"8000000000000000000000000000000000000000000000000000000000000000"
+					"000000000000000000000000000000000000000000000000000000000000006f",
+					"687d1b459dc841457e3e06cf6f5e2517b97c7d614af138bcbf85dc806c4b289f"
+					"3e965d2db1416d217f8b276fad1ab69c50f78bee1fa3106efb8ccbc7c5140116",
+					"8000000000000000000000000000000000000000000000000000000000000001"
+					"49a1ec142565a545acfdb77bd9d40cfa8b996712101bea0ec6346c54374f25bd",
+					"0000000000000000000000000000000000000000000000000000000000000000"
+					"0000000000000000000000000000000000000000000000000000000000000002",
+					"1a8f7eda389b094c2c071e3647a8940f3c123b697578c213be6dd9e6c8ec7335"
+					"dcb228fd1edf4a39152cbcaaf8c0398828041055f94ceeec7e21340780fe41bd",
+					NULL, NULL);
+
+      ecc->ref = ecc_alloc (3);
+      ecc_set_str (&ecc->ref[0], /* 2 g */
+		   "73729fb3c0d629ae5dc9bf88ca05d518bce91e502150f5e5822fa0293bc0e3ca31145f3b0e1831d8bb1f20b28780011473339e581a403c676b47c1f9ab764602",
+		   "35d62c90549f2c17e16c6ea99d3c3dbe610f2c543fc1d0ca5bd48a5ea1d3ec11c3cec5e7fcd74b5306e73b6a8e40c818714f02b25997ee2b54f65432d3f0741e");
+
+      ecc_set_str (&ecc->ref[1], /* 3 g */
+		   "1826b56c8dc1d5779b76354070e744f2c9c82755a921142b528f2fe04f5fd0dbdc178314c4546270b423d9fe819ba4c82625b02004bfdf90a08317dceb9309b7",
+		   "4f6882f8f6422d693f8313bb7b121117ad9ee6b8874135f3e4bff91b01141fdb35d29bc3cf15ab8a3b751050e58392a8eeae790ea5d198eab642dc520fd1713f");
+
+      ecc_set_str (&ecc->ref[2], /* 4 g */
+		   "5af069b1624dba4513c303b66b90543d97dbec20b5ba013e4f43ed9e2b88bdc5ac69701b626a8a546d03d52f8510d50df944978b0d33565ab75599b0d0a18563",
+		   "19eb28c4ee08a66894ca5cb76e160478a4f94c061b1115357557dacd5370bfc22bd1d0faa2e9d72af11ae65cb2335c53f617052331eb56050a972da4efe55eb7");
+
+  } else {
+      fprintf (stderr, "No known curve for name %s\n", curve);
       exit(EXIT_FAILURE);     
-    }
-  ecc->bit_size = bit_size;
+  }
+  ecc->bit_size = mpz_sizeinbase(ecc->p, 2);
 }
 
 static void
@@ -1200,11 +1337,11 @@ main (int argc, char **argv)
 
   if (argc < 4)
     {
-      fprintf (stderr, "Usage: %s CURVE-BITS K C [BITS-PER-LIMB]\n", argv[0]);
+      fprintf (stderr, "Usage: %s CURVE K C [BITS-PER-LIMB]\n", argv[0]);
       return EXIT_FAILURE;
     }
 
-  ecc_curve_init (&ecc, atoi(argv[1]));
+  ecc_curve_init (&ecc, argv[1]);
 
   ecc_pippenger_precompute (&ecc, atoi(argv[2]), atoi(argv[3]));
 

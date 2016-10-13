@@ -85,6 +85,13 @@ extern const struct ecc_curve _nettle_secp_521r1;
    general ecc operations over an arbitrary type of curve. */
 extern const struct ecc_curve _nettle_curve25519;
 
+/* GOST curves, visible with underscore prefix for now */
+extern const struct ecc_curve _nettle_gost_256cpa;
+extern const struct ecc_curve _nettle_gost_256cpb;
+extern const struct ecc_curve _nettle_gost_256cpc;
+extern const struct ecc_curve _nettle_gost_512a;
+extern const struct ecc_curve _nettle_gost_512b;
+
 #define ECC_MAX_SIZE ((521 + GMP_NUMB_BITS - 1) / GMP_NUMB_BITS)
 
 /* Window size for ecc_mul_a. Using 4 bits seems like a good choice,
