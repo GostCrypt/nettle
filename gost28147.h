@@ -40,8 +40,15 @@
 extern "C" {
 #endif
 
+/* S-Boxes & parameters */
 #define gost28147_param_test_3411 nettle_gost28147_param_test_3411
 #define gost28147_param_CryptoPro_3411 nettle_gost28147_param_CryptoPro_3411
+#define gost28147_param_Test_89 nettle_gost28147_param_Test_89
+#define gost28147_param_CryptoPro_A nettle_gost28147_param_CryptoPro_A
+#define gost28147_param_CryptoPro_B nettle_gost28147_param_CryptoPro_B
+#define gost28147_param_CryptoPro_C nettle_gost28147_param_CryptoPro_C
+#define gost28147_param_CryptoPro_D nettle_gost28147_param_CryptoPro_D
+#define gost28147_param_TC26_Z nettle_gost28147_param_TC26_Z
 
 struct gost28147_param
 {
@@ -50,6 +57,12 @@ struct gost28147_param
 
 extern const struct gost28147_param gost28147_param_test_3411;
 extern const struct gost28147_param gost28147_param_CryptoPro_3411;
+extern const struct gost28147_param gost28147_param_Test_89;
+extern const struct gost28147_param gost28147_param_CryptoPro_A;
+extern const struct gost28147_param gost28147_param_CryptoPro_B;
+extern const struct gost28147_param gost28147_param_CryptoPro_C;
+extern const struct gost28147_param gost28147_param_CryptoPro_D;
+extern const struct gost28147_param gost28147_param_TC26_Z;
 
 #ifdef __cplusplus
 }
