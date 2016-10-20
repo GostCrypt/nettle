@@ -50,6 +50,17 @@
 #define mpz_roinit_n _nettle_mpz_roinit_n
 #endif
 
+#ifdef mpn_zero_p
+#define GMP_HAVE_mpn_zero_p 1
+#else
+#define GMP_HAVE_mpn_zero_p 0
+#endif
+
+#if !GMP_HAVE_mpn_zero_p
+#define mpn_zero_p _nettle_mpn_zero_p
+#endif
+
+
 #define cnd_swap _nettle_cnd_swap
 #define mpz_limbs_cmp _nettle_mpz_limbs_cmp
 #define mpz_limbs_read_n _nettle_mpz_limbs_read_n
@@ -117,6 +128,11 @@ mpz_srcptr
 mpz_roinit_n (mpz_ptr x, const mp_limb_t *xp, mp_size_t xs);
 
 #endif /* !GMP_HAVE_mpz_limbs_read */
+
+#if !GMP_HAVE_mpn_zero_p
+int
+mpn_zero_p (const mp_limb_t *xp, mp_size_t n);
+#endif /* !GMP_HAVE_mpn_zero_p */
 
 void
 cnd_swap (mp_limb_t cnd, mp_limb_t *ap, mp_limb_t *bp, mp_size_t n);

@@ -116,6 +116,18 @@ mpz_roinit_n (mpz_ptr x, const mp_limb_t *xp, mp_size_t xs)
 }
 #endif /* !GMP_HAVE_mpz_limbs_read */
 
+#if !GMP_HAVE_mpn_zero_p
+int
+mpn_zero_p (const mp_limb_t *xp, mp_size_t n)
+{
+  while (n > 0)
+    if (xp[--n] > 0)
+      return 0;
+  return 1;
+}
+
+#endif /* !GMP_HAVE_mpn_zero_p */
+
 void
 cnd_swap (mp_limb_t cnd, mp_limb_t *ap, mp_limb_t *bp, mp_size_t n)
 {
