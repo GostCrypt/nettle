@@ -13,6 +13,7 @@ const char* ciphers[] = {
   "camellia192",
   "camellia256",
   "cast128",
+  "gost28147",
   "serpent128",
   "serpent192",
   "serpent256",

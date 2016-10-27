@@ -50,6 +50,20 @@ extern "C" {
 #define gost28147_param_CryptoPro_D nettle_gost28147_param_CryptoPro_D
 #define gost28147_param_TC26_Z nettle_gost28147_param_TC26_Z
 
+#define gost28147_set_key nettle_gost28147_set_key
+#define gost28147_set_param nettle_gost28147_set_param
+#define gost28147_encrypt nettle_gost28147_encrypt
+#define gost28147_decrypt nettle_gost28147_decrypt
+
+#define GOST28147_KEY_SIZE 32
+#define GOST28147_BLOCK_SIZE 8
+
+struct gost28147_ctx
+{
+  uint32_t key[GOST28147_KEY_SIZE/4];
+  const uint32_t (*sbox)[256];
+};
+
 struct gost28147_param
 {
   uint32_t sbox[4][256];
@@ -63,6 +77,22 @@ extern const struct gost28147_param gost28147_param_CryptoPro_B;
 extern const struct gost28147_param gost28147_param_CryptoPro_C;
 extern const struct gost28147_param gost28147_param_CryptoPro_D;
 extern const struct gost28147_param gost28147_param_TC26_Z;
+
+void
+gost28147_set_key(struct gost28147_ctx *ctx, const uint8_t *key);
+
+void
+gost28147_set_param(struct gost28147_ctx *ctx,
+		    const struct gost28147_param *param);
+
+void
+gost28147_encrypt(const struct gost28147_ctx *ctx,
+		  size_t length, uint8_t *dst,
+		  const uint8_t *src);
+void
+gost28147_decrypt(const struct gost28147_ctx *ctx,
+		  size_t length, uint8_t *dst,
+		  const uint8_t *src);
 
 #ifdef __cplusplus
 }

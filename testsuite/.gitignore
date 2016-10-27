@@ -42,6 +42,7 @@
 /eddsa-sign-test
 /eddsa-verify-test
 /gcm-test
+/gost28147-test
 /gosthash94-test
 /hkdf-test
 /hmac-test

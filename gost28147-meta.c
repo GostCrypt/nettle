@@ -1,8 +1,6 @@
-/* gost28147-internal.h
+/* gost28147-meta.c
 
-   The GOST 28147-89 cipher function, described in RFC 5831.
-
-   Copyright (C) 2019 Dmitry Eremin-Solenikov
+   Copyright (C) 2016 Dmitry Eremin-Solenikov
 
    This file is part of GNU Nettle.
 
@@ -31,15 +29,21 @@
    not, see http://www.gnu.org/licenses/.
 */
 
-#ifndef NETTLE_GOST28147_INTERNAL_H_INCLUDED
-#define NETTLE_GOST28147_INTERNAL_H_INCLUDED
+#if HAVE_CONFIG_H
+# include "config.h"
+#endif
 
-#define _gost28147_encrypt_block _nettle_gost28147_encrypt_block
-#define _gost28147_decrypt_block _nettle_gost28147_decrypt_block
+#include <assert.h>
 
-void _gost28147_encrypt_block (const uint32_t *key, const uint32_t sbox[4][256],
-			       const uint32_t *in, uint32_t *out);
-void _gost28147_decrypt_block (const uint32_t *key, const uint32_t sbox[4][256],
-			       const uint32_t *in, uint32_t *out);
+#include "nettle-meta.h"
 
-#endif /* NETTLE_GOST28147_INTERNAL_H_INCLUDED */
+#include "gost28147.h"
+
+const struct nettle_cipher nettle_gost28147 =
+  { "gost28147", sizeof(struct gost28147_ctx),
+    GOST28147_BLOCK_SIZE, GOST28147_KEY_SIZE,
+    (nettle_set_key_func *) gost28147_set_key,
+    (nettle_set_key_func *) gost28147_set_key,
+    (nettle_cipher_func *) gost28147_encrypt,
+    (nettle_cipher_func *) gost28147_decrypt
+  };

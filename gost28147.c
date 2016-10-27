@@ -32,6 +32,8 @@
 #include "config.h"
 #endif
 
+#include <assert.h>
+
 #include "macros.h"
 #include "gost28147.h"
 #include "gost28147-internal.h"
@@ -2216,4 +2218,87 @@ void _gost28147_encrypt_block (const uint32_t *key, const uint32_t sbox[4][256],
   GOST_ENCRYPT_ROUND(l, r, key[3], key[2], sbox);
   GOST_ENCRYPT_ROUND(l, r, key[1], key[0], sbox);
   *out = l, *(out + 1) = r;
+}
+
+void _gost28147_decrypt_block (const uint32_t *key, const uint32_t sbox[4][256],
+			       const uint32_t *in, uint32_t *out)
+{
+  uint32_t l, r;
+
+  r = in[0], l = in[1];
+  GOST_ENCRYPT_ROUND(l, r, key[0], key[1], sbox);
+  GOST_ENCRYPT_ROUND(l, r, key[2], key[3], sbox);
+  GOST_ENCRYPT_ROUND(l, r, key[4], key[5], sbox);
+  GOST_ENCRYPT_ROUND(l, r, key[6], key[7], sbox);
+  GOST_ENCRYPT_ROUND(l, r, key[7], key[6], sbox);
+  GOST_ENCRYPT_ROUND(l, r, key[5], key[4], sbox);
+  GOST_ENCRYPT_ROUND(l, r, key[3], key[2], sbox);
+  GOST_ENCRYPT_ROUND(l, r, key[1], key[0], sbox);
+  GOST_ENCRYPT_ROUND(l, r, key[7], key[6], sbox);
+  GOST_ENCRYPT_ROUND(l, r, key[5], key[4], sbox);
+  GOST_ENCRYPT_ROUND(l, r, key[3], key[2], sbox);
+  GOST_ENCRYPT_ROUND(l, r, key[1], key[0], sbox);
+  GOST_ENCRYPT_ROUND(l, r, key[7], key[6], sbox);
+  GOST_ENCRYPT_ROUND(l, r, key[5], key[4], sbox);
+  GOST_ENCRYPT_ROUND(l, r, key[3], key[2], sbox);
+  GOST_ENCRYPT_ROUND(l, r, key[1], key[0], sbox);
+  *out = l, *(out + 1) = r;
+}
+
+void
+gost28147_set_key(struct gost28147_ctx *ctx, const uint8_t *key)
+{
+  unsigned i;
+
+  assert(key);
+  for (i = 0; i < 8; i++, key += 4)
+    ctx->key[i] = LE_READ_UINT32(key);
+  gost28147_set_param(ctx, &gost28147_param_TC26_Z);
+}
+
+void
+gost28147_set_param(struct gost28147_ctx *ctx, const struct gost28147_param *param)
+{
+  assert(param);
+  ctx->sbox = param->sbox;
+}
+
+void
+gost28147_encrypt(const struct gost28147_ctx *ctx,
+		  size_t length, uint8_t *dst,
+		  const uint8_t *src)
+{
+  uint32_t block[2];
+
+  assert(!(length % GOST28147_BLOCK_SIZE));
+
+  while (length)
+    {
+      block[0] = LE_READ_UINT32(src); src += 4;
+      block[1] = LE_READ_UINT32(src); src += 4;
+      _gost28147_encrypt_block(ctx->key, ctx->sbox, block, block);
+      LE_WRITE_UINT32(dst, block[0]); dst += 4;
+      LE_WRITE_UINT32(dst, block[1]); dst += 4;
+      length -= GOST28147_BLOCK_SIZE;
+    }
+}
+
+void
+gost28147_decrypt(const struct gost28147_ctx *ctx,
+		  size_t length, uint8_t *dst,
+		  const uint8_t *src)
+{
+  uint32_t block[2];
+
+  assert(!(length % GOST28147_BLOCK_SIZE));
+
+  while (length)
+    {
+      block[0] = LE_READ_UINT32(src); src += 4;
+      block[1] = LE_READ_UINT32(src); src += 4;
+      _gost28147_decrypt_block(ctx->key, ctx->sbox, block, block);
+      LE_WRITE_UINT32(dst, block[0]); dst += 4;
+      LE_WRITE_UINT32(dst, block[1]); dst += 4;
+      length -= GOST28147_BLOCK_SIZE;
+    }
 }

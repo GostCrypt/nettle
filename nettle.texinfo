@@ -1793,6 +1793,44 @@ in any other way.
 Analogous to @code{des_encrypt}
 @end deftypefun
 
+@subsection GOST 28147-89 (Magma)
+GOST 28147-89 (also called Magma) is the Russian standard cipher. It uses a
+block size of 64 bits (8 octets), and a key size of 256 bits. Nettle defines
+GOST28147 in @file{<nettle/gost28147.h>}.
+
+@deftp {Context struct} {struct gost28147_ctx}
+@end deftp
+
+@defvr Constant GOST28147_BLOCK_SIZE
+The GOST28147 block-size, 8.
+@end defvr
+
+@defvr Constant GOST28147_KEY_SIZE
+GOST28147 key size, 32.
+@end defvr
+
+@deftypefun void gost28147_set_key (struct gost28147_ctx *@var{ctx}, const uint8_t *@var{key})
+Initialize the cipher. The same function is used for both encryption and
+decryption.
+@end deftypefun
+
+@deftypefun void gost28147_set_sbox (struct gost28147_ctx *@var{ctx}, const uint32_t *@var{sbox})
+Initialize the cipher S-BOX. The same function is used for both encryption and
+decryption.
+@end deftypefun
+
+@deftypefun void gost28147_encrypt (struct gost28147_ctx *@var{ctx}, size_t @var{length}, uint8_t *@var{dst}, const uint8_t *@var{src})
+Encryption function. @var{length} must be an integral multiple of the
+block size. If it is more than one block, the data is processed in ECB
+mode. @code{src} and @code{dst} may be equal, but they must not overlap
+in any other way.
+@end deftypefun
+
+@deftypefun void gost28147_decrypt (struct gost28147_ctx *@var{ctx}, size_t @var{length}, uint8_t *@var{dst}, const uint8_t *@var{src})
+Analogous to @code{gost28147_encrypt}
+@end deftypefun
+
+
 @subsection Salsa20
 @cindex Salsa20
 Salsa20 is a fairly recent stream cipher designed by D. J. Bernstein. It
