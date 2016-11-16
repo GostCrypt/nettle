@@ -36,6 +36,7 @@
 #include <string.h>
 
 #include "macros.h"
+#include "nettle-write.h"
 #include "gost28147.h"
 #include "gost28147-internal.h"
 #include "memxor.h"
@@ -2286,15 +2287,21 @@ static void gost28147_key_mesh_cryptopro(struct gost28147_ctx *ctx)
   ctx->key_count = 0;
 }
 
-void
-gost28147_set_key(struct gost28147_ctx *ctx, const uint8_t *key)
+static void
+_gost28147_set_key(struct gost28147_ctx *ctx, const uint8_t *key)
 {
   unsigned i;
 
-  assert(key);
   for (i = 0; i < 8; i++, key += 4)
     ctx->key[i] = LE_READ_UINT32(key);
   ctx->key_count = 0;
+}
+
+void
+gost28147_set_key(struct gost28147_ctx *ctx, const uint8_t *key)
+{
+  assert(key);
+  _gost28147_set_key(ctx, key);
   gost28147_set_param(ctx, &gost28147_param_TC26_Z);
 }
 
@@ -2456,4 +2463,98 @@ gost28147_cnt_crypt(struct gost28147_cnt_ctx *ctx,
       memxor3(dst, src, ctx->buffer, length);
       ctx->bytes = block_size - length;
     }
+}
+
+void
+gost28147_imit_init(struct gost28147_imit_ctx *ctx)
+{
+  memset(ctx->state, 0, GOST28147_BLOCK_SIZE);
+  ctx->index = 0;
+  ctx->count = 0;
+  gost28147_set_param(&ctx->cctx, &gost28147_param_TC26_Z); /* Default */
+}
+
+void
+gost28147_imit_set_key(struct gost28147_imit_ctx *ctx,
+		       size_t length,
+		       const uint8_t *key)
+{
+  assert(length == GOST28147_IMIT_KEY_SIZE);
+  assert(key);
+
+  _gost28147_set_key(&ctx->cctx, key);
+  /* Do not reset param here */
+}
+
+void
+gost28147_imit_set_nonce(struct gost28147_imit_ctx *ctx, const uint8_t *nonce)
+{
+	ctx->state[0] = LE_READ_UINT32(nonce + 0);
+	ctx->state[1] = LE_READ_UINT32(nonce + 4);
+}
+
+void
+gost28147_imit_set_param(struct gost28147_imit_ctx *ctx,
+			 const struct gost28147_param *param)
+{
+  assert(param);
+  gost28147_set_param(&ctx->cctx, param);
+}
+
+static void
+gost28147_imit_compress(struct gost28147_imit_ctx *ctx,
+			const uint8_t *data)
+{
+  uint32_t l, r;
+
+  if (ctx->cctx.key_meshing && ctx->cctx.key_count == 1024)
+    gost28147_key_mesh_cryptopro(&ctx->cctx);
+
+  r = LE_READ_UINT32(data + 0) ^ ctx->state[0];
+  l = LE_READ_UINT32(data + 4) ^ ctx->state[1];
+
+  GOST_ENCRYPT_ROUND(l, r, ctx->cctx.key[0], ctx->cctx.key[1], ctx->cctx.sbox);
+  GOST_ENCRYPT_ROUND(l, r, ctx->cctx.key[2], ctx->cctx.key[3], ctx->cctx.sbox);
+  GOST_ENCRYPT_ROUND(l, r, ctx->cctx.key[4], ctx->cctx.key[5], ctx->cctx.sbox);
+  GOST_ENCRYPT_ROUND(l, r, ctx->cctx.key[6], ctx->cctx.key[7], ctx->cctx.sbox);
+  GOST_ENCRYPT_ROUND(l, r, ctx->cctx.key[0], ctx->cctx.key[1], ctx->cctx.sbox);
+  GOST_ENCRYPT_ROUND(l, r, ctx->cctx.key[2], ctx->cctx.key[3], ctx->cctx.sbox);
+  GOST_ENCRYPT_ROUND(l, r, ctx->cctx.key[4], ctx->cctx.key[5], ctx->cctx.sbox);
+  GOST_ENCRYPT_ROUND(l, r, ctx->cctx.key[6], ctx->cctx.key[7], ctx->cctx.sbox);
+
+  ctx->state[0] = r;
+  ctx->state[1] = l;
+
+  ctx->cctx.key_count += 8;
+}
+
+void
+gost28147_imit_update(struct gost28147_imit_ctx *ctx,
+		      size_t length,
+		      const uint8_t *data)
+{
+  MD_UPDATE(ctx, length, data, gost28147_imit_compress, ctx->count++);
+}
+
+void
+gost28147_imit_digest(struct gost28147_imit_ctx *ctx,
+		      size_t length,
+		      uint8_t *digest)
+{
+  assert(length <= GOST28147_IMIT_DIGEST_SIZE);
+  const uint8_t zero[GOST28147_IMIT_BLOCK_SIZE] = { 0 };
+
+  if (ctx->index)
+    {
+      assert(ctx->index < GOST28147_IMIT_BLOCK_SIZE);
+      gost28147_imit_update(ctx, GOST28147_IMIT_BLOCK_SIZE - ctx->index, zero);
+    }
+
+  if (ctx->count == 1)
+    {
+      gost28147_imit_update(ctx, GOST28147_IMIT_BLOCK_SIZE, zero);
+    }
+
+  _nettle_write_le32(length, digest, ctx->state);
+  gost28147_imit_init(ctx);
 }

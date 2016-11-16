@@ -181,6 +181,34 @@ test_gost28147_cnt(const struct gost28147_param *param,
   free(data);
 }
 
+static void
+test_gost28147_imit(const struct gost28147_param *param,
+		    const struct tstring *key,
+		    const struct tstring *cleartext,
+		    const struct tstring *imit)
+{
+  struct gost28147_imit_ctx ctx;
+  uint8_t data[GOST28147_IMIT_DIGEST_SIZE];
+
+  gost28147_imit_init(&ctx);
+  gost28147_imit_set_key(&ctx, key->length, key->data);
+  gost28147_imit_set_param(&ctx, param);
+  gost28147_imit_update(&ctx, cleartext->length, cleartext->data);
+  gost28147_imit_digest(&ctx, imit->length, data);
+
+  if (!MEMEQ(imit->length, data, imit->data))
+    {
+      fprintf(stderr, "IMIT failed:\nInput:");
+      tstring_print_hex(cleartext);
+      fprintf(stderr, "\nOutput: ");
+      print_hex(imit->length, data);
+      fprintf(stderr, "\nExpected:");
+      tstring_print_hex(imit);
+      fprintf(stderr, "\n");
+      FAIL();
+    }
+}
+
 void test_main(void)
 {
   /* Examples from GOST R 34.11-94 standard */
@@ -420,4 +448,78 @@ void test_main(void)
       SHEX("626804b2e7ba1be2"),
       SHEX("90a23966ae01b9a3 524ec8ed6cdd8830"),
       SHEX("e8b14fc730dc25bb 36ba643c17dbff99"));
+
+  /* From Open/LibreSSL testsuite */
+  test_gost28147_imit(&gost28147_param_CryptoPro_A,
+      SHEX("9d05b79e90cad00a 2cdad22ef4e86f5c f5dc37681985b3bf aa18c1c3050a91a2"),
+      SHEX("b5a1f0e3 ce2f021d 67619434 5c41e36e"),
+      SHEX("f81f08a3"));
+
+  test_gost28147_imit(&gost28147_param_CryptoPro_A,
+      SHEX("80d9a0dc21f93040 75fe491b9e719091 7888216039e7c92b fb551df4dd2b0a01"),
+      SHEX("d6cf31969ca1fbd6 8da3dd01d988c02f bc46c73ae4218696 8de2cab637a2e1a8"
+	   "7ea7792ea456757f 3e558b43ae65dfaa 42b600a661030dd3 4102272395799b34"
+	   "81a986b5a790e2ae c42fc38e325613fa 4d4e9f15757e74dc 322dee4d67709f62"
+	   "b9c4db2484cc167b da22f7c5f3933573 c6031c77a5f27656 b495d47e0d20c66e"
+	   "ee8f2548ff7e013a b41faa35c033589c b5ba654bd35114ec 61cee4ba49ba3932"
+	   "abce8172ceabedd4 d219878592fa6434 d886f48a083cdeee 97929269ba9b5f7a"
+	   "03c15d43028cbed2 467281407d689845 0b54271caf8042e4 d5d4e4a298078f03"
+	   "f52c8c88ca5adee4 9fb15f82ff206752 85844fc8fea79eae 1cfab875d3f79f0d"
+	   "da2de6cc866ba414 65c3f915bc87f5ae 8c10d4ce5b9ce2dd 4203098747ed5dd0"
+	   "7a694cfa437dbf07 856aee68e67a57b2 208d80f2916f5c07 8ce46a4990858b77"
+	   "29561c5ea93fab8b 79a36f6b34cb61f6 e692d1489e11a282 c04e23d2150d8dff"
+	   "fa179d81b8bcd75b 08812040c03c068b 1a880b4b7b31f5d4 4e09d14d0d7f45d1"
+	   "0935bace65ddf2b8 fb7abcc44bc875da 6bce3de894cc236f b03b4f7d07b90f62"
+	   "927eda7050ced328 121100eb8d637078 a87b76abc640c04e 80ddf0fe8372564c"
+	   "094cf17272862631 c3c2dc8ec7f435ec 17066347498847af b3384f7e4495b5bb"
+	   "1dbd5a915bd01adf 0d0b50d8e20ec500 2d5b2919aa2b64c5 40314811bc04d1cf"
+	   "6df9a52f4ac982fa 59e1fcab1c33260a 5feff206d8d37e16 58167873aebaebe5"
+	   "3db20ab3322d14a4 fa3f1f43f97ba943 9818940707e51934 a8165f7167aa29e5"
+	   "faf083061d9dfcfe fe8cb5b2a9e7a040 60b6719eab5b83b9 0c2b582380099e5d"
+	   "947d4076a916969e 83e00deca0ec762a b7a0ffb8504c5bc6 8b0a652efeb4409a"
+	   "01d8c6a3ab99a2c5 0c08c4b7ee4d1dc4 0815d0dbaa634f31 eb149743bdc19408"
+	   "e6de439f950b967e 7f3c68ba6fc4c935 2bc40eda1f916864 633473be5775b9ed"
+	   "f72d3b0521932848 969597a0d27d78bb 6a498f76557463b9 c5361225bf03828f"
+	   "f0f680bb33b4f417 271cf34c10a3e4d1 55d968214e5a8367 bff83c7d4e62d328"
+	   "a7266fe9eec20b2d 0384b1ffd6681fb6 f2e40fda2dee5f6e 21c8e1fcad6b0e04"
+	   "7dafc23ba5689b0c f356f3da8dc87d39 dcd599c60110ce42 1bac48dc97780aec"
+	   "b38f4735a36a64b2 8e63692266ae2ee0 88f9403cc9a25761 f6adf0dc90563f06"
+	   "9b7dbdc28102abb8 1509884aff2f31bf 5efa6a7ef6c5a7f7 d5ab55acae0d8c8d"
+	   "7f4b25bb32ff1133 2e373769961517b1 1749e09a9cd95b8d 58a31d9287f880b9"
+	   "bd5aec40e1003360 e486166d6181f228 6aa7ce3f95ae43ca e13f81747e1c4717"
+	   "95c660da7477d99f fa92b4bee1239818 956303134c1a2d41 cde484f7e638efff"
+	   "95b2e87c8f58b5b5 ed277f3c18abbe7f 4fe2351571b76f85 389b88f69c8d43b5"
+	   "589ef2d196beb7ad 1aa098"),
+      SHEX("90f2119a"));
+
+  test_gost28147_imit(&gost28147_param_CryptoPro_A,
+      SHEX("a9b637cc6d9b2f25 b0df47045068b027 4127586abd0a6e50 2fc6fcc03e2942a5"),
+      SHEX("1debe6790a5900e6 8e5c"),
+      SHEX("317c16e4"));
+
+  test_gost28147_imit(&gost28147_param_CryptoPro_A,
+      SHEX("b06c48230a6ef4ec 27980123a7d8bf60 89efade88f79148c 185c9adaef0bdda0"),
+      SHEX("ef068f14c904"),
+      SHEX("e972aebf"));
+
+  test_gost28147_imit(&gost28147_param_CryptoPro_B,
+      SHEX("33d3ef0119950e15 a16975ae56271779 6347ab629d4af034 d31e6974ec3148fc"),
+      SHEX("02f8ec2b4d1fbc7c 6e47e387227541a7"),
+      SHEX("f5551f28"));
+
+  test_gost28147_imit(&gost28147_param_CryptoPro_A,
+      SHEX("423581910ba999ff d943f8c619551f2f 2d4540201e1d327a b1076b4f4590d980"),
+      SHEX("f3b229d27a370312"),
+      SHEX("6e15fae8"));
+
+  test_gost28147_imit(&gost28147_param_CryptoPro_A,
+      SHEX("26cbb9f00c629faa 4a1db63009015689 66d4e40efef6106b 6ce8043ae3614b19"),
+      SHEX(""),
+      SHEX("00000000"));
+
+  test_gost28147_imit(&gost28147_param_TC26_Z,
+      SHEX("9d05b79e90cad00a 2cdad22ef4e86f5c f5dc37681985b3bf aa18c1c3050a91a2"),
+      SHEX("b5a1f0e3 ce2f021d 67619434 5c41e36e"),
+      SHEX("03e56766"));
+
 }
