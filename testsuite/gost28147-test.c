@@ -209,6 +209,76 @@ test_gost28147_imit(const struct gost28147_param *param,
     }
 }
 
+static void
+test_gost28147_wrap(const struct gost28147_param *param,
+		    const struct tstring *kek,
+		    const struct tstring *ukm,
+		    const struct tstring *cek,
+		    const struct tstring *enc,
+		    const struct tstring *imit)
+{
+  uint8_t data[GOST28147_KEY_SIZE], data_imit[GOST28147_IMIT_DIGEST_SIZE];
+  uint8_t data2[GOST28147_KEY_SIZE];
+  int ret;
+
+  gost28147_key_wrap_cryptopro(param, kek->data, ukm->data, ukm->length,
+			       cek->data, data, data_imit);
+
+  if (!MEMEQ(enc->length, data, enc->data))
+    {
+      fprintf(stderr, "Wrap failed:\nInput:");
+      tstring_print_hex(cek);
+      fprintf(stderr, "\nOutput: ");
+      print_hex(enc->length, data);
+      fprintf(stderr, "\nExpected:");
+      tstring_print_hex(enc);
+      fprintf(stderr, "\n");
+      FAIL();
+    }
+
+  if (!MEMEQ(imit->length, data_imit, imit->data))
+    {
+      fprintf(stderr, "Wrap failed:\nInput:");
+      tstring_print_hex(cek);
+      fprintf(stderr, "\nIMIT Output: ");
+      print_hex(imit->length, data_imit);
+      fprintf(stderr, "\nIMIT Expected:");
+      tstring_print_hex(imit);
+      fprintf(stderr, "\n");
+      FAIL();
+    }
+
+  ret = gost28147_key_unwrap_cryptopro(param, kek->data,
+				       ukm->data, ukm->length,
+				       data, data_imit, data2);
+  ASSERT(ret);
+  if (!MEMEQ(cek->length, data2, cek->data))
+    {
+      fprintf(stderr, "Unwrap failed:\nInput:");
+      tstring_print_hex(enc);
+      tstring_print_hex(imit);
+      fprintf(stderr, "\nOutput: ");
+      print_hex(cek->length, data2);
+      fprintf(stderr, "\nExpected:");
+      tstring_print_hex(cek);
+      fprintf(stderr, "\n");
+      FAIL();
+    }
+
+  data[0] ^= 1;
+  data_imit[0] ^= 1;
+
+  ret = gost28147_key_unwrap_cryptopro(param, kek->data,
+				       ukm->data, ukm->length,
+				       data, imit->data, data2);
+  ASSERT(!ret);
+
+  ret = gost28147_key_unwrap_cryptopro(param, kek->data,
+				       ukm->data, ukm->length,
+				       enc->data, data_imit, data2);
+  ASSERT(!ret);
+}
+
 void test_main(void)
 {
   /* Examples from GOST R 34.11-94 standard */
@@ -522,4 +592,10 @@ void test_main(void)
       SHEX("b5a1f0e3 ce2f021d 67619434 5c41e36e"),
       SHEX("03e56766"));
 
+  test_gost28147_wrap(&gost28147_param_TC26_Z,
+      SHEX("94DC0DCE F7BB36F7 5B94689E BB788B8B 8093DEA3 44062AC2 048194EC 078559B9"),
+      SHEX("BDE6576E 0E5CCD9E"),
+      SHEX("6BFF027B 125DC258 F07AD427 8093A408 B6F126E3 E949C585 3D6C0F5E 4072B6AA"),
+      SHEX("6ED1C0AE A3B0832B 2B75937F 5954E3C0 D307F660 7290976A F62791A8 6EB26A7B"),
+      SHEX("83D12F2C"));
 }
