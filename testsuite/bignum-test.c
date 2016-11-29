@@ -35,6 +35,30 @@ test_bignum(const char *hex, const struct tstring *base256)
 }
 
 static void
+test_bignum_le(const char *hex, const struct tstring *base256)
+{
+  mpz_t a;
+  mpz_t b;
+  uint8_t *buf;
+
+  mpz_init_set_str(a, hex, 16);
+  nettle_mpz_init_set_str_256_u_le(b, base256->length, base256->data);
+
+  ASSERT(mpz_cmp(a, b) == 0);
+
+  buf = xalloc(base256->length + 1);
+  memset(buf, 17, base256->length + 1);
+
+  nettle_mpz_get_str_256_u_le(base256->length, buf, a);
+  ASSERT(MEMEQ(base256->length, buf, base256->data));
+
+  ASSERT(buf[base256->length] == 17);
+
+  mpz_clear(a); mpz_clear(b);
+  free(buf);
+}
+
+static void
 test_size(long x, unsigned size)
 {
   mpz_t t;
@@ -86,6 +110,11 @@ test_main(void)
   test_bignum("-7fff", SHEX(  "8001"));
   test_bignum("-8000", SHEX(  "8000"));
   test_bignum("-8001", SHEX("ff7fff"));
+
+  test_bignum_le("0", SHEX("00"));
+  test_bignum_le("010203040506", SHEX("060504030201"));
+  test_bignum_le("80010203040506", SHEX("06050403020180"));
+  test_bignum_le("01020304050680", SHEX("80060504030201"));
   
 #else /* !WITH_HOGWEED */
   SKIP();

@@ -68,10 +68,18 @@ nettle_mpz_sizeinbase_256_s(const mpz_t x);
 size_t
 nettle_mpz_sizeinbase_256_u(const mpz_t x);
 
+#define nettle_mpz_sizeinbase_256_u_le nettle_mpz_sizeinbase_256_u
+
 /* Writes an integer as length octets, using big endian byte order,
  * and two's complement for negative numbers. */
 void
 nettle_mpz_get_str_256(size_t length, uint8_t *s, const mpz_t x);
+
+/* Writes an integer as length octets, using big endian byte order,
+ * and unsigned number format. */
+void
+nettle_mpz_get_str_256_u_le(size_t length, uint8_t *s, const mpz_t x);
+
 
 /* Reads a big endian, two's complement, integer. */
 void
@@ -91,6 +99,15 @@ nettle_mpz_set_str_256_u(mpz_t x,
 void
 nettle_mpz_init_set_str_256_u(mpz_t x,
 			      size_t length, const uint8_t *s);
+
+/* Similar, but for little endian byte order. */
+void
+nettle_mpz_set_str_256_u_le(mpz_t x,
+			    size_t length, const uint8_t *s);
+
+void
+nettle_mpz_init_set_str_256_u_le(mpz_t x,
+				 size_t length, const uint8_t *s);
 
 /* Returns a uniformly distributed random number 0 <= x < 2^n */
 void
