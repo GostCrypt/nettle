@@ -73,10 +73,12 @@ ecc_mod_mul_1 (const struct ecc_modulo *m, mp_limb_t *rp,
   assert (b <= 0xffffffff);
   hi = mpn_mul_1 (rp, ap, m->size, b);
   hi = mpn_addmul_1 (rp, m->B, m->size, hi);
-  assert (hi <= 1);
-  hi = cnd_add_n (hi, rp, m->B, m->size);
-  /* Sufficient if b < B^size / p */
-  assert (hi == 0);
+  do {
+    if (hi > 1) /* This is necessary for some of GOST curves */
+      hi = mpn_addmul_1 (rp, m->B, m->size, hi);
+    else
+      hi = cnd_add_n (hi, rp, m->B, m->size);
+  } while (hi != 0);
 }
 
 void
@@ -88,10 +90,12 @@ ecc_mod_addmul_1 (const struct ecc_modulo *m, mp_limb_t *rp,
   assert (b <= 0xffffffff);
   hi = mpn_addmul_1 (rp, ap, m->size, b);
   hi = mpn_addmul_1 (rp, m->B, m->size, hi);
-  assert (hi <= 1);
-  hi = cnd_add_n (hi, rp, m->B, m->size);
-  /* Sufficient roughly if b < B^size / p */
-  assert (hi == 0);
+  do {
+    if (hi > 1) /* This is necessary for some of GOST curves */
+      hi = mpn_addmul_1 (rp, m->B, m->size, hi);
+    else
+      hi = cnd_add_n (hi, rp, m->B, m->size);
+  } while (hi != 0);
 }
   
 void
@@ -103,10 +107,12 @@ ecc_mod_submul_1 (const struct ecc_modulo *m, mp_limb_t *rp,
   assert (b <= 0xffffffff);
   hi = mpn_submul_1 (rp, ap, m->size, b);
   hi = mpn_submul_1 (rp, m->B, m->size, hi);
-  assert (hi <= 1);
-  hi = cnd_sub_n (hi, rp, m->B, m->size);
-  /* Sufficient roughly if b < B^size / p */
-  assert (hi == 0);
+  do {
+    if (hi > 1) /* This is necessary for some of GOST curves */
+      hi = mpn_submul_1 (rp, m->B, m->size, hi);
+    else
+      hi = cnd_sub_n (hi, rp, m->B, m->size);
+  } while (hi != 0);
 }
 
 /* NOTE: mul and sqr needs 2*m->size limbs at rp */
