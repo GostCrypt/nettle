@@ -91,6 +91,7 @@ extern const struct nettle_cipher nettle_arctwo_gutmann128;
 
 extern const struct nettle_cipher nettle_gost28147;
 extern const struct nettle_cipher nettle_magma;
+extern const struct nettle_cipher nettle_kuznyechik;
 
 struct nettle_hash
 {

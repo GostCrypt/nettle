@@ -40,6 +40,8 @@ core
 /gcmdata
 /shadata
 /twofishdata
+/kuzdata
+/kuztable.h
 /keymap.h
 /parity.h
 /rotors.h

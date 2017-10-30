@@ -37,6 +37,9 @@ des3-test$(EXEEXT): des3-test.$(OBJEXT)
 gost28147-test$(EXEEXT): gost28147-test.$(OBJEXT)
 	$(LINK) gost28147-test.$(OBJEXT) $(TEST_OBJS) -o gost28147-test$(EXEEXT)
 
+kuznyechik-test$(EXEEXT): kuznyechik-test.$(OBJEXT)
+	$(LINK) kuznyechik-test.$(OBJEXT) $(TEST_OBJS) -o kuznyechik-test$(EXEEXT)
+
 magma-test$(EXEEXT): magma-test.$(OBJEXT)
 	$(LINK) magma-test.$(OBJEXT) $(TEST_OBJS) -o magma-test$(EXEEXT)
 
