@@ -14,6 +14,7 @@ const char* ciphers[] = {
   "camellia256",
   "cast128",
   "gost28147",
+  "magma",
   "serpent128",
   "serpent192",
   "serpent256",

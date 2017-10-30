@@ -1,6 +1,6 @@
-/* nettle-meta-ciphers.c
+/* magma-meta.c
 
-   Copyright (C) 2011 Daniel Kahn Gillmor
+   Copyright (C) 2017 Dmitry Eremin-Solenikov
 
    This file is part of GNU Nettle.
 
@@ -33,34 +33,17 @@
 # include "config.h"
 #endif
 
-#include <stddef.h>
+#include <assert.h>
+
 #include "nettle-meta.h"
 
-const struct nettle_cipher * const _nettle_ciphers[] = {
-  &nettle_aes128,
-  &nettle_aes192,
-  &nettle_aes256,
-  &nettle_camellia128,
-  &nettle_camellia192,
-  &nettle_camellia256,
-  &nettle_cast128,
-  &nettle_serpent128,
-  &nettle_serpent192,
-  &nettle_serpent256,
-  &nettle_twofish128,
-  &nettle_twofish192,
-  &nettle_twofish256,
-  &nettle_arctwo40,
-  &nettle_arctwo64,
-  &nettle_arctwo128,
-  &nettle_arctwo_gutmann128,
-  &nettle_gost28147,
-  &nettle_magma,
-  NULL
-};
+#include "magma.h"
 
-const struct nettle_cipher * const *
-nettle_get_ciphers (void)
-{
-  return _nettle_ciphers;
-}
+const struct nettle_cipher nettle_magma =
+  { "magma", sizeof(struct magma_ctx),
+    MAGMA_BLOCK_SIZE, MAGMA_KEY_SIZE,
+    (nettle_set_key_func *) magma_set_key,
+    (nettle_set_key_func *) magma_set_key,
+    (nettle_cipher_func *) magma_encrypt,
+    (nettle_cipher_func *) magma_decrypt
+  };

@@ -51,6 +51,7 @@
 /hkdf-test
 /hmac-test
 /knuth-lfib-test
+/magma-test
 /md2-test
 /md4-test
 /md5-compat-test

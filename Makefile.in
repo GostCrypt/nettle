@@ -109,6 +109,7 @@ nettle_SOURCES = aes-decrypt-internal.c aes-decrypt.c \
 		 hmac-sha1.c hmac-sha224.c hmac-sha256.c hmac-sha384.c \
 		 hmac-sha512.c hmac-streebog.c \
 		 knuth-lfib.c hkdf.c \
+		 magma.c magma-meta.c \
 		 md2.c md2-meta.c md4.c md4-meta.c \
 		 md5.c md5-compress.c md5-compat.c md5-meta.c \
 		 memeql-sec.c memxor.c memxor3.c \
@@ -208,7 +209,7 @@ HEADERS = aes.h arcfour.h arctwo.h asn1.h blowfish.h \
 	  knuth-lfib.h hkdf.h \
 	  macros.h \
 	  cmac.h siv-cmac.h \
-	  md2.h md4.h \
+	  magma.h md2.h md4.h \
 	  md5.h md5-compat.h \
 	  memops.h memxor.h \
 	  nettle-meta.h nettle-types.h \
