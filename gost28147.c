@@ -33,6 +33,7 @@
 #endif
 
 #include <assert.h>
+#include <string.h>
 
 #include "macros.h"
 #include "gost28147.h"
@@ -303,7 +304,8 @@ const struct gost28147_param gost28147_param_test_3411 =
       0x00000600, 0x00000650, 0x00000670, 0x00000638,
       0x00000630, 0x00000640, 0x00000610, 0x00000660,
     }
-  }
+  },
+  0
 };
 
 const struct gost28147_param gost28147_param_CryptoPro_3411 =
@@ -570,7 +572,8 @@ const struct gost28147_param gost28147_param_CryptoPro_3411 =
       0x00000618, 0x00000660, 0x00000640, 0x00000678,
       0x00000630, 0x00000610, 0x00000648, 0x00000658,
     }
-  }
+  },
+  0
 };
 
 const struct gost28147_param gost28147_param_Test_89 =
@@ -837,7 +840,8 @@ const struct gost28147_param gost28147_param_Test_89 =
       0x00000420, 0x00000440, 0x00000470, 0x00000478,
       0x00000408, 0x00000450, 0x00000410, 0x00000468,
     }
-  }
+  },
+  1
 };
 
 const struct gost28147_param gost28147_param_CryptoPro_A =
@@ -1104,7 +1108,8 @@ const struct gost28147_param gost28147_param_CryptoPro_A =
       0x00000240, 0x00000260, 0x00000220, 0x00000228,
       0x00000278, 0x00000218, 0x00000258, 0x00000270,
     }
-  }
+  },
+  1
 };
 
 const struct gost28147_param gost28147_param_CryptoPro_B =
@@ -1371,7 +1376,8 @@ const struct gost28147_param gost28147_param_CryptoPro_B =
       0x00000638, 0x00000620, 0x00000668, 0x00000600,
       0x00000630, 0x00000678, 0x00000640, 0x00000670,
     }
-  }
+  },
+  1
 };
 
 const struct gost28147_param gost28147_param_CryptoPro_C =
@@ -1638,7 +1644,8 @@ const struct gost28147_param gost28147_param_CryptoPro_C =
       0x00000478, 0x00000418, 0x00000428, 0x00000458,
       0x00000420, 0x00000408, 0x00000460, 0x00000438,
     }
-  }
+  },
+  1
 };
 
 const struct gost28147_param gost28147_param_CryptoPro_D =
@@ -1905,7 +1912,8 @@ const struct gost28147_param gost28147_param_CryptoPro_D =
       0x00000768, 0x00000740, 0x00000760, 0x00000720,
       0x00000758, 0x00000750, 0x00000728, 0x00000738,
     }
-  }
+  },
+  1
 };
 
 const struct gost28147_param gost28147_param_TC26_Z =
@@ -2172,7 +2180,8 @@ const struct gost28147_param gost28147_param_TC26_Z =
       0x00000178, 0x00000120, 0x00000158, 0x00000100,
       0x00000168, 0x00000150, 0x00000118, 0x00000138,
     }
-  }
+  },
+  1
 };
 
 /*
@@ -2245,6 +2254,37 @@ void _gost28147_decrypt_block (const uint32_t *key, const uint32_t sbox[4][256],
   *out = l, *(out + 1) = r;
 }
 
+static const uint32_t gost28147_key_mesh_cryptopro_data[GOST28147_KEY_SIZE / 4] = {
+  0x22720069, 0x2304c964,
+  0x96db3a8d, 0xc42ae946,
+  0x94acfe18, 0x1207ed00,
+  0xc2dc86c0, 0x2ba94cef,
+};
+
+static void gost28147_key_mesh_cryptopro(struct gost28147_ctx *ctx)
+{
+  uint32_t newkey[GOST28147_KEY_SIZE/4];
+
+  _gost28147_decrypt_block(ctx->key, ctx->sbox,
+			   &gost28147_key_mesh_cryptopro_data[0],
+			   &newkey[0]);
+
+  _gost28147_decrypt_block(ctx->key, ctx->sbox,
+			   &gost28147_key_mesh_cryptopro_data[2],
+			   &newkey[2]);
+
+  _gost28147_decrypt_block(ctx->key, ctx->sbox,
+			   &gost28147_key_mesh_cryptopro_data[4],
+			   &newkey[4]);
+
+  _gost28147_decrypt_block(ctx->key, ctx->sbox,
+			   &gost28147_key_mesh_cryptopro_data[6],
+			   &newkey[6]);
+
+  memcpy(ctx->key, newkey, sizeof(newkey));
+  ctx->key_count = 0;
+}
+
 void
 gost28147_set_key(struct gost28147_ctx *ctx, const uint8_t *key)
 {
@@ -2253,6 +2293,7 @@ gost28147_set_key(struct gost28147_ctx *ctx, const uint8_t *key)
   assert(key);
   for (i = 0; i < 8; i++, key += 4)
     ctx->key[i] = LE_READ_UINT32(key);
+  ctx->key_count = 0;
   gost28147_set_param(ctx, &gost28147_param_TC26_Z);
 }
 
@@ -2261,6 +2302,7 @@ gost28147_set_param(struct gost28147_ctx *ctx, const struct gost28147_param *par
 {
   assert(param);
   ctx->sbox = param->sbox;
+  ctx->key_meshing = param->key_meshing;
 }
 
 void
@@ -2300,5 +2342,32 @@ gost28147_decrypt(const struct gost28147_ctx *ctx,
       LE_WRITE_UINT32(dst, block[0]); dst += 4;
       LE_WRITE_UINT32(dst, block[1]); dst += 4;
       length -= GOST28147_BLOCK_SIZE;
+    }
+}
+
+void
+gost28147_encrypt_for_cfb(struct gost28147_ctx *ctx,
+			  size_t length, uint8_t *dst,
+			  const uint8_t *src)
+{
+  uint32_t block[2];
+
+  assert(!(length % GOST28147_BLOCK_SIZE));
+
+  while (length)
+    {
+      block[0] = LE_READ_UINT32(src); src += 4;
+      block[1] = LE_READ_UINT32(src); src += 4;
+      if (ctx->key_meshing && ctx->key_count == 1024)
+	{
+	  gost28147_key_mesh_cryptopro(ctx);
+	  _gost28147_encrypt_block(ctx->key, ctx->sbox, block, block);
+	  ctx->key_count = 0;
+	}
+      _gost28147_encrypt_block(ctx->key, ctx->sbox, block, block);
+      LE_WRITE_UINT32(dst, block[0]); dst += 4;
+      LE_WRITE_UINT32(dst, block[1]); dst += 4;
+      length -= GOST28147_BLOCK_SIZE;
+      ctx->key_count += GOST28147_BLOCK_SIZE;
     }
 }
