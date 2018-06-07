@@ -38,6 +38,7 @@
 
 #include "aes.h"
 #include "des.h"
+#include "magma.h"
 #include "nettle-types.h"
 
 #ifdef __cplusplus
@@ -65,6 +66,9 @@ extern "C" {
 #define cmac_des3_set_key nettle_cmac_des3_set_key
 #define cmac_des3_update nettle_cmac_des3_update
 #define cmac_des3_digest nettle_cmac_des3_digest
+#define cmac_magma_set_key nettle_cmac_magma_set_key
+#define cmac_magma_update nettle_cmac_magma_update
+#define cmac_magma_digest nettle_cmac_magma_digest
 
 struct cmac128_key
 {
@@ -229,6 +233,19 @@ cmac_des3_update(struct cmac_des3_ctx *ctx,
 void
 cmac_des3_digest(struct cmac_des3_ctx *ctx,
 		 size_t length, uint8_t *digest);
+
+struct cmac_magma_ctx CMAC64_CTX(struct magma_ctx);
+
+void
+cmac_magma_set_key(struct cmac_magma_ctx *ctx, const uint8_t *key);
+
+void
+cmac_magma_update(struct cmac_magma_ctx *ctx,
+		  size_t length, const uint8_t *data);
+
+void
+cmac_magma_digest(struct cmac_magma_ctx *ctx,
+		  size_t length, uint8_t *digest);
 
 #ifdef __cplusplus
 }

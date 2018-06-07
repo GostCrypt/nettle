@@ -38,6 +38,30 @@ const struct nettle_mac nettle_cmac_des3 =
   (nettle_hash_digest_func*) cmac_des3_digest
 };
 
+const struct nettle_mac nettle_cmac_magma =
+{
+  "CMAC-MAGMA",
+  sizeof(struct cmac_magma_ctx),
+  CMAC64_DIGEST_SIZE,
+  MAGMA_KEY_SIZE,
+
+  (nettle_set_key_func*) cmac_magma_set_key,
+  (nettle_hash_update_func*) cmac_magma_update,
+  (nettle_hash_digest_func*) cmac_magma_digest
+};
+
+const struct nettle_mac nettle_cmac_magma_32 =
+{
+  "CMAC-MAGMA-32",
+  sizeof(struct cmac_magma_ctx),
+  4,
+  MAGMA_KEY_SIZE,
+
+  (nettle_set_key_func*) cmac_magma_set_key,
+  (nettle_hash_update_func*) cmac_magma_update,
+  (nettle_hash_digest_func*) cmac_magma_digest
+};
+
 #define test_cmac_aes128(key, msg, ref)					\
   test_mac(&nettle_cmac_aes128, key, msg, ref)
 
@@ -128,4 +152,16 @@ test_main(void)
   test_cmac_des3 (SHEX("0123456789abcdef23456789abcdef01456789abcdef0123"),
 		  SHEX("6bc1bee22e409f96e93d7e117393172aae2d8a571e03ac9c9eb76fac45af8e51"),
 		  SHEX("99429bd0bf7904e5"));
+
+  /* Truncated CMACs come from GOST R 34.13-2015
+   * Full-length examples are from TLS (draft) standard */
+  test_mac(&nettle_cmac_magma,
+      SHEX("507642d958c520c6d7eef5ca8a5316d4 f34b855d2dd4bcbf4e5bf0ff641a19ff"),
+      SHEX("0000000000000000170303000700000000000000"),
+      SHEX("3070b864779d9547"));
+
+  test_mac(&nettle_cmac_magma_32,
+      SHEX("ffeeddccbbaa99887766554433221100f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff"),
+      SHEX("92def06b3c130a59 db54c704f8189d20 4a98fb2e67a8024c 8912409b17b57e41"),
+      SHEX("154e7210"));
 }
