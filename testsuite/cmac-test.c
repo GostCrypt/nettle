@@ -62,6 +62,30 @@ const struct nettle_mac nettle_cmac_magma_32 =
   (nettle_hash_digest_func*) cmac_magma_digest
 };
 
+const struct nettle_mac nettle_cmac_kuznyechik =
+{
+  "CMAC-KUZNYECHIK",
+  sizeof(struct cmac_kuznyechik_ctx),
+  CMAC128_DIGEST_SIZE,
+  KUZNYECHIK_KEY_SIZE,
+
+  (nettle_set_key_func*) cmac_kuznyechik_set_key,
+  (nettle_hash_update_func*) cmac_kuznyechik_update,
+  (nettle_hash_digest_func*) cmac_kuznyechik_digest
+};
+
+const struct nettle_mac nettle_cmac_kuznyechik_64 =
+{
+  "CMAC-KUZNYECHIK-64",
+  sizeof(struct cmac_kuznyechik_ctx),
+  8,
+  KUZNYECHIK_KEY_SIZE,
+
+  (nettle_set_key_func*) cmac_kuznyechik_set_key,
+  (nettle_hash_update_func*) cmac_kuznyechik_update,
+  (nettle_hash_digest_func*) cmac_kuznyechik_digest
+};
+
 #define test_cmac_aes128(key, msg, ref)					\
   test_mac(&nettle_cmac_aes128, key, msg, ref)
 
@@ -160,8 +184,21 @@ test_main(void)
       SHEX("0000000000000000170303000700000000000000"),
       SHEX("3070b864779d9547"));
 
+  test_mac(&nettle_cmac_kuznyechik,
+      SHEX("507642d958c520c6d7eef5ca8a5316d4 f34b855d2dd4bcbf4e5bf0ff641a19ff"),
+      SHEX("0000000000000000170303000f000000000000000000000000000000"),
+      SHEX("755309cbc73bb949 c50ebb86160a0fee"));
+
   test_mac(&nettle_cmac_magma_32,
       SHEX("ffeeddccbbaa99887766554433221100f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff"),
       SHEX("92def06b3c130a59 db54c704f8189d20 4a98fb2e67a8024c 8912409b17b57e41"),
       SHEX("154e7210"));
+
+  test_mac(&nettle_cmac_kuznyechik_64,
+      SHEX("8899aabbccddeeff0011223344556677fedcba98765432100123456789abcdef"),
+      SHEX("1122334455667700ffeeddccbbaa9988"
+	   "00112233445566778899aabbcceeff0a"
+	   "112233445566778899aabbcceeff0a00"
+	   "2233445566778899aabbcceeff0a0011"),
+      SHEX("336f4d296059fbe3"));
 }

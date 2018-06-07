@@ -38,6 +38,7 @@
 
 #include "aes.h"
 #include "des.h"
+#include "kuznyechik.h"
 #include "magma.h"
 #include "nettle-types.h"
 
@@ -58,6 +59,9 @@ extern "C" {
 #define cmac_aes256_set_key nettle_cmac_aes256_set_key
 #define cmac_aes256_update nettle_cmac_aes256_update
 #define cmac_aes256_digest nettle_cmac_aes256_digest
+#define cmac_kuznyechik_set_key nettle_cmac_kuznyechik_set_key
+#define cmac_kuznyechik_update nettle_cmac_kuznyechik_update
+#define cmac_kuznyechik_digest nettle_cmac_kuznyechik_digest
 
 #define cmac64_set_key nettle_cmac64_set_key
 #define cmac64_init nettle_cmac64_init
@@ -246,6 +250,19 @@ cmac_magma_update(struct cmac_magma_ctx *ctx,
 void
 cmac_magma_digest(struct cmac_magma_ctx *ctx,
 		  size_t length, uint8_t *digest);
+
+struct cmac_kuznyechik_ctx CMAC128_CTX(struct kuznyechik_ctx);
+
+void
+cmac_kuznyechik_set_key(struct cmac_kuznyechik_ctx *ctx, const uint8_t *key);
+
+void
+cmac_kuznyechik_update(struct cmac_kuznyechik_ctx *ctx,
+		       size_t length, const uint8_t *data);
+
+void
+cmac_kuznyechik_digest(struct cmac_kuznyechik_ctx *ctx,
+		       size_t length, uint8_t *digest);
 
 #ifdef __cplusplus
 }
