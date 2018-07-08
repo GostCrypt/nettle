@@ -1,3 +1,6 @@
+acpkm-test$(EXEEXT): acpkm-test.$(OBJEXT)
+	$(LINK) acpkm-test.$(OBJEXT) $(TEST_OBJS) -o acpkm-test$(EXEEXT)
+
 aes-test$(EXEEXT): aes-test.$(OBJEXT)
 	$(LINK) aes-test.$(OBJEXT) $(TEST_OBJS) -o aes-test$(EXEEXT)
 

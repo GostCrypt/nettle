@@ -62,7 +62,7 @@ dvi installcheck uninstallcheck:
 
 all-here: $(TARGETS) $(DOCTARGETS)
 
-nettle_SOURCES = aes-decrypt-internal.c aes-decrypt.c \
+nettle_SOURCES = acpkm.c aes-decrypt-internal.c aes-decrypt.c \
 		 aes-encrypt-internal.c aes-encrypt.c aes-encrypt-table.c \
 		 aes-invert-internal.c aes-set-key-internal.c \
 		 aes-set-encrypt-key.c aes-set-decrypt-key.c \
@@ -202,7 +202,7 @@ hogweed_SOURCES = sexp.c sexp-format.c \
 
 OPT_SOURCES = fat-x86_64.c fat-arm.c mini-gmp.c
 
-HEADERS = aes.h arcfour.h arctwo.h asn1.h blowfish.h \
+HEADERS = acpkm.h aes.h arcfour.h arctwo.h asn1.h blowfish.h \
 	  base16.h base64.h bignum.h buffer.h camellia.h cast128.h \
 	  cbc.h ccm.h cfb.h chacha.h chacha-poly1305.h ctr.h \
 	  curve25519.h des.h dsa.h dsa-compat.h eax.h \
