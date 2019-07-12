@@ -115,6 +115,8 @@ nettle_SOURCES = acpkm.c aes-decrypt-internal.c aes-decrypt.c \
 		 md2.c md2-meta.c md4.c md4-meta.c \
 		 md5.c md5-compress.c md5-compat.c md5-meta.c \
 		 memeql-sec.c memxor.c memxor3.c \
+		 mgm.c mgm64.c mgm-kuznyechik.c mgm-kuznyechik-meta.c \
+		 mgm-magma.c mgm-magma-meta.c \
 		 nettle-lookup-hash.c \
 		 nettle-meta-aeads.c nettle-meta-armors.c \
 		 nettle-meta-ciphers.c nettle-meta-hashes.c \
@@ -215,6 +217,7 @@ HEADERS = acpkm.h aes.h arcfour.h arctwo.h asn1.h blowfish.h \
 	  magma.h md2.h md4.h \
 	  md5.h md5-compat.h \
 	  memops.h memxor.h \
+	  mgm.h \
 	  nettle-meta.h nettle-types.h \
 	  pbkdf2.h \
 	  pgp.h pkcs1.h pss.h pss-mgf1.h realloc.h ripemd160.h rsa.h \

@@ -1,6 +1,9 @@
-/* nettle-meta-aeads.c
+/* mgm-magma-meta.c
 
-   Copyright (C) 2014 Niels Möller
+   Multilinear Galois Mode,
+   https://tools.ietf.org/id/draft-smyshlyaev-mgm-11.html
+
+   Copyright (C) 2019 Dmitry Eremin-Solenikov
 
    This file is part of GNU Nettle.
 
@@ -33,25 +36,19 @@
 # include "config.h"
 #endif
 
-#include <stddef.h>
-
 #include "nettle-meta.h"
 
-const struct nettle_aead * const _nettle_aeads[] = {
-  &nettle_gcm_aes128,
-  &nettle_gcm_aes192,
-  &nettle_gcm_aes256,
-  &nettle_gcm_camellia128,
-  &nettle_gcm_camellia256,
-  &nettle_eax_aes128,
-  &nettle_chacha_poly1305,
-  &nettle_mgm_kuznyechik,
-  &nettle_mgm_magma,
-  NULL
-};
+#include "mgm.h"
 
-const struct nettle_aead * const *
-nettle_get_aeads (void)
-{
-  return _nettle_aeads;
-}
+const struct nettle_aead nettle_mgm_magma =
+  { "mgm_magma", sizeof(struct mgm_magma_ctx),
+    MGM64_BLOCK_SIZE, KUZNYECHIK_KEY_SIZE,
+    MGM64_IV_SIZE, MGM64_DIGEST_SIZE,
+    (nettle_set_key_func *) mgm_magma_set_key,
+    (nettle_set_key_func *) mgm_magma_set_key,
+    (nettle_set_key_func *) mgm_magma_set_iv,
+    (nettle_hash_update_func *) mgm_magma_update,
+    (nettle_crypt_func *) mgm_magma_encrypt,
+    (nettle_crypt_func *) mgm_magma_decrypt,
+    (nettle_hash_digest_func *) mgm_magma_digest,
+  };

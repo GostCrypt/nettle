@@ -67,6 +67,9 @@ memxor-test$(EXEEXT): memxor-test.$(OBJEXT)
 gosthash94-test$(EXEEXT): gosthash94-test.$(OBJEXT)
 	$(LINK) gosthash94-test.$(OBJEXT) $(TEST_OBJS) -o gosthash94-test$(EXEEXT)
 
+mgm-test$(EXEEXT): mgm-test.$(OBJEXT)
+	$(LINK) mgm-test.$(OBJEXT) $(TEST_OBJS) -o mgm-test$(EXEEXT)
+
 ripemd160-test$(EXEEXT): ripemd160-test.$(OBJEXT)
 	$(LINK) ripemd160-test.$(OBJEXT) $(TEST_OBJS) -o ripemd160-test$(EXEEXT)
 

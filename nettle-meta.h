@@ -185,6 +185,8 @@ extern const struct nettle_aead nettle_gcm_camellia128;
 extern const struct nettle_aead nettle_gcm_camellia256;
 extern const struct nettle_aead nettle_eax_aes128;
 extern const struct nettle_aead nettle_chacha_poly1305;
+extern const struct nettle_aead nettle_mgm_kuznyechik;
+extern const struct nettle_aead nettle_mgm_magma;
 
 struct nettle_armor
 {

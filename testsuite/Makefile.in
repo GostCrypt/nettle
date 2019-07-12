@@ -19,6 +19,7 @@ TS_NETTLE_SOURCES = acpkm-test.c aes-test.c arcfour-test.c arctwo-test.c \
 		    gost28147-test.c kuznyechik-test.c magma-test.c \
 		    md2-test.c md4-test.c md5-test.c md5-compat-test.c \
 		    memeql-test.c memxor-test.c gosthash94-test.c \
+		    mgm-test.c \
 		    ripemd160-test.c hkdf-test.c \
 		    salsa20-test.c \
 		    sha1-test.c sha224-test.c sha256-test.c \
