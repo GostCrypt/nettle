@@ -33,6 +33,10 @@
 
 #define kdf_gostr3411_2012_256 nettle_kdf_gostr3411_2012_256
 #define kdf_tree_gostr3411_2012_256 nettle_kdf_tree_gostr3411_2012_256
+#define tlstree_init nettle_tlstree_init
+#define tlstree_get nettle_tlstree_get
+#define tlstree_magma_const nettle_tlstree_magma_const
+#define tlstree_kuznyechik_const nettle_tlstree_kuznyechik_const
 
 void
 kdf_gostr3411_2012_256 (size_t key_length, const uint8_t *key,
@@ -46,5 +50,29 @@ kdf_tree_gostr3411_2012_256 (size_t key_length, const uint8_t *key,
 			     size_t seed_length, const uint8_t *seed,
 			     size_t r,
 			     size_t length, uint8_t *out);
+
+#define TLSTREE_KEY_LENGTH 32
+
+struct tlstree_const
+{
+	uint64_t c1, c2, c3;
+};
+
+struct tlstree_ctx
+{
+  uint8_t k1[TLSTREE_KEY_LENGTH];
+  uint8_t k2[TLSTREE_KEY_LENGTH];
+  uint8_t k3[TLSTREE_KEY_LENGTH];
+  uint64_t seq;
+};
+
+extern const struct tlstree_const tlstree_magma_const;
+extern const struct tlstree_const tlstree_kuznyechik_const;
+
+void tlstree_init(struct tlstree_ctx *ctx,
+		  const struct tlstree_const *tlsconst, const uint8_t *key);
+void tlstree_get(struct tlstree_ctx *ctx,
+		 const struct tlstree_const *tlsconst, const uint8_t *key,
+		 uint64_t seq, uint8_t *out);
 
 #endif

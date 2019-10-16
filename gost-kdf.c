@@ -36,6 +36,8 @@
 #include "macros.h"
 #include "gost-kdf.h"
 
+#include <string.h>
+
 /* See RFC 7836 */
 static void
 kdf_tree_gostr3411_2012_256_single (struct hmac_streebog256_ctx *ctx,
@@ -111,4 +113,86 @@ kdf_tree_gostr3411_2012_256 (size_t key_length, const uint8_t *key,
       out += block;
       length -= block;
     }
+}
+
+/* draft-smyshlyaev-tls12-gost-suites */
+
+#define TLSTREE_L1 ((uint8_t *)"level1")
+#define TLSTREE_L2 ((uint8_t *)"level2")
+#define TLSTREE_L3 ((uint8_t *)"level3")
+
+const struct tlstree_const tlstree_magma_const =
+{
+  .c1 = UINT64_C(0xFFFFFFC000000000),
+  .c2 = UINT64_C(0xFFFFFFFFFE000000),
+  .c3 = UINT64_C(0xFFFFFFFFFFFFF000)
+};
+
+const struct tlstree_const tlstree_kuznyechik_const =
+{
+  .c1 = UINT64_C(0xFFFFFFFF00000000),
+  .c2 = UINT64_C(0xFFFFFFFFFFF80000),
+  .c3 = UINT64_C(0xFFFFFFFFFFFFFFC0)
+};
+
+void tlstree_init(struct tlstree_ctx *ctx,
+		  const struct tlstree_const *tlsconst,
+		  const uint8_t *key)
+{
+  uint8_t s[8];
+
+  ctx->seq = 0;
+
+  memset(s, 0, sizeof(s));
+  kdf_gostr3411_2012_256(TLSTREE_KEY_LENGTH, key,
+			 6, TLSTREE_L1,
+			 sizeof(s), s,
+			 TLSTREE_KEY_LENGTH, ctx->k1);
+  kdf_gostr3411_2012_256(TLSTREE_KEY_LENGTH, ctx->k1,
+			 6, TLSTREE_L2,
+			 sizeof(s), s,
+			 TLSTREE_KEY_LENGTH, ctx->k2);
+  kdf_gostr3411_2012_256(TLSTREE_KEY_LENGTH, ctx->k2,
+			 6, TLSTREE_L3,
+			 sizeof(s), s,
+			 TLSTREE_KEY_LENGTH, ctx->k3);
+}
+
+void tlstree_get(struct tlstree_ctx *ctx,
+		 const struct tlstree_const *tlsconst,
+		 const uint8_t *key,
+		 uint64_t seq, uint8_t *out)
+{
+  uint8_t s[8];
+
+  if ((seq & tlsconst->c1) != (ctx->seq & tlsconst->c1))
+    {
+      WRITE_UINT64(s, seq & tlsconst->c1);
+      kdf_gostr3411_2012_256(TLSTREE_KEY_LENGTH, key,
+			     6, TLSTREE_L1,
+			     sizeof(s), s,
+			     TLSTREE_KEY_LENGTH, ctx->k1);
+    }
+
+  if ((seq & tlsconst->c2) != (ctx->seq & tlsconst->c2))
+    {
+      WRITE_UINT64(s, seq & tlsconst->c2);
+      kdf_gostr3411_2012_256(TLSTREE_KEY_LENGTH, ctx->k1,
+			     6, TLSTREE_L2,
+			     sizeof(s), s,
+			     TLSTREE_KEY_LENGTH, ctx->k2);
+    }
+
+  if ((seq & tlsconst->c3) != (ctx->seq & tlsconst->c3))
+    {
+      WRITE_UINT64(s, seq & tlsconst->c3);
+      kdf_gostr3411_2012_256(TLSTREE_KEY_LENGTH, ctx->k2,
+			     6, TLSTREE_L3,
+			     sizeof(s), s,
+			     TLSTREE_KEY_LENGTH, ctx->k3);
+    }
+
+  ctx->seq = seq;
+
+  memcpy(out, ctx->k3, TLSTREE_KEY_LENGTH);
 }
