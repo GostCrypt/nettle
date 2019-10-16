@@ -104,7 +104,7 @@ nettle_SOURCES = acpkm.c aes-decrypt-internal.c aes-decrypt.c \
 		 gcm-camellia256.c gcm-camellia256-meta.c \
 		 cmac.c cmac64.c cmac-aes128.c cmac-aes256.c cmac-des3.c \
 		 cmac-kuznyechik.c cmac-magma.c \
-		 gost28147.c gost28147-meta.c gost-wrap.c \
+		 gost28147.c gost28147-meta.c gost-kdf.c gost-wrap.c \
 		 gosthash94.c gosthash94-meta.c \
 		 hmac.c hmac-gosthash94.c hmac-md5.c hmac-ripemd160.c \
 		 hmac-sha1.c hmac-sha224.c hmac-sha256.c hmac-sha384.c \
@@ -209,7 +209,7 @@ HEADERS = acpkm.h aes.h arcfour.h arctwo.h asn1.h blowfish.h \
 	  cbc.h ccm.h cfb.h chacha.h chacha-poly1305.h ctr.h \
 	  curve25519.h des.h dsa.h dsa-compat.h eax.h \
 	  ecc-curve.h ecc.h ecdsa.h eddsa.h \
-	  gcm.h gost28147.h gostdsa.h gosthash94.h hmac.h \
+	  gcm.h gost28147.h gost-kdf.h gostdsa.h gosthash94.h hmac.h \
 	  knuth-lfib.h hkdf.h \
 	  kuznyechik.h \
 	  macros.h \

@@ -40,6 +40,9 @@ des3-test$(EXEEXT): des3-test.$(OBJEXT)
 gost28147-test$(EXEEXT): gost28147-test.$(OBJEXT)
 	$(LINK) gost28147-test.$(OBJEXT) $(TEST_OBJS) -o gost28147-test$(EXEEXT)
 
+gost-kdf-test$(EXEEXT): gost-kdf-test.$(OBJEXT)
+	$(LINK) gost-kdf-test.$(OBJEXT) $(TEST_OBJS) -o gost-kdf-test$(EXEEXT)
+
 kuznyechik-test$(EXEEXT): kuznyechik-test.$(OBJEXT)
 	$(LINK) kuznyechik-test.$(OBJEXT) $(TEST_OBJS) -o kuznyechik-test$(EXEEXT)
 
