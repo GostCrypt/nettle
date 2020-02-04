@@ -33,6 +33,7 @@
 #endif
 
 #include "macros.h"
+#include "gost28147.h"
 #include "gost28147-internal.h"
 
 /* pre-initialized GOST lookup tables based on rotated S-Box */
@@ -569,3 +570,13 @@ const struct gost28147_param _gost28147_param_CryptoPro_3411 =
     }
   }
 };
+
+const struct gost28147_param * gost28147_get_param_test_3411 (void)
+{
+  return &_gost28147_param_test_3411;
+}
+
+const struct gost28147_param * gost28147_get_param_CryptoPro_3411 (void)
+{
+  return &_gost28147_param_CryptoPro_3411;
+}
