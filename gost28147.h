@@ -42,6 +42,12 @@ extern "C" {
 
 #define gost28147_get_param_test_3411 nettle_gost28147_get_param_test_3411
 #define gost28147_get_param_CryptoPro_3411 nettle_gost28147_get_param_CryptoPro_3411
+#define gost28147_get_param_Test_89 nettle_gost28147_get_param_Test_89
+#define gost28147_get_param_CryptoPro_A nettle_gost28147_get_param_CryptoPro_A
+#define gost28147_get_param_CryptoPro_B nettle_gost28147_get_param_CryptoPro_B
+#define gost28147_get_param_CryptoPro_C nettle_gost28147_get_param_CryptoPro_C
+#define gost28147_get_param_CryptoPro_D nettle_gost28147_get_param_CryptoPro_D
+#define gost28147_get_param_TC26_Z nettle_gost28147_get_param_TC26_Z
 
 #define gost28147_set_key nettle_gost28147_set_key
 #define gost28147_set_param nettle_gost28147_set_param
@@ -61,6 +67,12 @@ struct gost28147_param;
 
 const struct gost28147_param * gost28147_get_param_test_3411 (void);
 const struct gost28147_param * gost28147_get_param_CryptoPro_3411 (void);
+const struct gost28147_param * gost28147_get_param_Test_89 (void);
+const struct gost28147_param * gost28147_get_param_CryptoPro_A (void);
+const struct gost28147_param * gost28147_get_param_CryptoPro_B (void);
+const struct gost28147_param * gost28147_get_param_CryptoPro_C (void);
+const struct gost28147_param * gost28147_get_param_CryptoPro_D (void);
+const struct gost28147_param * gost28147_get_param_TC26_Z (void);
 
 void
 gost28147_set_key(struct gost28147_ctx *ctx, const uint8_t *key);

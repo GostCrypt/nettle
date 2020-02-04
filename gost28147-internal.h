@@ -39,9 +39,19 @@
 #define _gost28147_encrypt_block _nettle_gost28147_encrypt_block
 #define _gost28147_param_test_3411 _nettle_gost28147_param_test_3411
 #define _gost28147_param_CryptoPro_3411 _nettle_gost28147_param_CryptoPro_3411
+#define _gost28147_param_CryptoPro_A _nettle_gost28147_param_CryptoPro_A
+#define _gost28147_param_CryptoPro_B _nettle_gost28147_param_CryptoPro_B
+#define _gost28147_param_CryptoPro_C _nettle_gost28147_param_CryptoPro_C
+#define _gost28147_param_CryptoPro_D _nettle_gost28147_param_CryptoPro_D
+#define _gost28147_param_TC26_Z _nettle_gost28147_param_TC26_Z
 
 extern const struct gost28147_param _gost28147_param_test_3411;
 extern const struct gost28147_param _gost28147_param_CryptoPro_3411;
+extern const struct gost28147_param _gost28147_param_CryptoPro_A;
+extern const struct gost28147_param _gost28147_param_CryptoPro_B;
+extern const struct gost28147_param _gost28147_param_CryptoPro_C;
+extern const struct gost28147_param _gost28147_param_CryptoPro_D;
+extern const struct gost28147_param _gost28147_param_TC26_Z;
 
 struct gost28147_param
 {

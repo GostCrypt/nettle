@@ -1,7 +1,5 @@
 #include "testutils.h"
 #include "gost28147.h"
-#include "cfb.h"
-#include "macros.h"
 
 static void
 test_gost28147(const struct gost28147_param *param,
@@ -74,4 +72,51 @@ void test_main(void)
       SHEX("EC0A8BA1 5EC004A8 BAC50CAC 0C621DEE E1C7B8E7 007AE2EC F2731BFF 4E80E2A0 "),
       SHEX("00000000 00000000"),
       SHEX("2D562A0D 190486E7 "));
+
+  /* Manually calculated */
+  test_gost28147(gost28147_get_param_test_3411(),
+      SHEX("8182838485868788 898a8b8c8d8e8f80 d1d2d3d4d5d6d7d8 d9dadbdcdddedfd0"),
+      SHEX("0102030405060708 f1f2f3f4f5f6f7f8"),
+      SHEX("ced52a7ff7f260d5 bc81a80bb5e65976"));
+
+  test_gost28147(gost28147_get_param_CryptoPro_3411(),
+      SHEX("8182838485868788 898a8b8c8d8e8f80 d1d2d3d4d5d6d7d8 d9dadbdcdddedfd0"),
+      SHEX("0102030405060708 f1f2f3f4f5f6f7f8"),
+      SHEX("e42175e16922d0a8 48e59157d7106518"));
+
+  test_gost28147(gost28147_get_param_Test_89(),
+      SHEX("8182838485868788 898a8b8c8d8e8f80 d1d2d3d4d5d6d7d8 d9dadbdcdddedfd0"),
+      SHEX("0102030405060708 f1f2f3f4f5f6f7f8"),
+      SHEX("9856cf8bfcc282f4 3f465801c6539a5c"));
+
+  test_gost28147(gost28147_get_param_CryptoPro_A(),
+      SHEX("8182838485868788 898a8b8c8d8e8f80 d1d2d3d4d5d6d7d8 d9dadbdcdddedfd0"),
+      SHEX("0102030405060708 f1f2f3f4f5f6f7f8"),
+      SHEX("668184aedc48c917 4164347058845cac"));
+
+  test_gost28147(gost28147_get_param_CryptoPro_B(),
+      SHEX("8182838485868788 898a8b8c8d8e8f80 d1d2d3d4d5d6d7d8 d9dadbdcdddedfd0"),
+      SHEX("0102030405060708 f1f2f3f4f5f6f7f8"),
+      SHEX("dbee81147b74b0f2 db5ef00eff4bd528"));
+
+  test_gost28147(gost28147_get_param_CryptoPro_C(),
+      SHEX("8182838485868788 898a8b8c8d8e8f80 d1d2d3d4d5d6d7d8 d9dadbdcdddedfd0"),
+      SHEX("0102030405060708 f1f2f3f4f5f6f7f8"),
+      SHEX("31a3859d0aeeb80e 4afbd6ce7798ffa9"));
+
+  test_gost28147(gost28147_get_param_CryptoPro_D(),
+      SHEX("8182838485868788 898a8b8c8d8e8f80 d1d2d3d4d5d6d7d8 d9dadbdcdddedfd0"),
+      SHEX("0102030405060708 f1f2f3f4f5f6f7f8"),
+      SHEX("b1323e0b2173cbd1 c5282f2461e97aa8"));
+
+  test_gost28147(gost28147_get_param_TC26_Z(),
+      SHEX("8182838485868788 898a8b8c8d8e8f80 d1d2d3d4d5d6d7d8 d9dadbdcdddedfd0"),
+      SHEX("0102030405060708 f1f2f3f4f5f6f7f8"),
+      SHEX("ce5a5ed7e0577a5f d0cc85ce31635b8b"));
+
+  /* From Magma spec, retrofitted for GOST 28147-89 */
+  test_gost28147(gost28147_get_param_TC26_Z(),
+      SHEX("ccddeeff8899aabb4455667700112233f3f2f1f0f7f6f5f4fbfaf9f8fffefdfc"),
+      SHEX("1032547698badcfe"),
+      SHEX("3dcad8c2e501e94e"));
 }
