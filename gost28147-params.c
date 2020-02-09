@@ -301,7 +301,8 @@ const struct gost28147_param _gost28147_param_test_3411 =
       0x00000600, 0x00000650, 0x00000670, 0x00000638,
       0x00000630, 0x00000640, 0x00000610, 0x00000660,
     }
-  }
+  },
+  0
 };
 
 const struct gost28147_param _gost28147_param_CryptoPro_3411 =
@@ -568,7 +569,8 @@ const struct gost28147_param _gost28147_param_CryptoPro_3411 =
       0x00000618, 0x00000660, 0x00000640, 0x00000678,
       0x00000630, 0x00000610, 0x00000648, 0x00000658,
     }
-  }
+  },
+  0
 };
 
 static const struct gost28147_param _gost28147_param_Test_89 =
@@ -835,7 +837,8 @@ static const struct gost28147_param _gost28147_param_Test_89 =
       0x00000420, 0x00000440, 0x00000470, 0x00000478,
       0x00000408, 0x00000450, 0x00000410, 0x00000468,
     }
-  }
+  },
+  0
 };
 
 const struct gost28147_param _gost28147_param_CryptoPro_A =
@@ -1102,7 +1105,8 @@ const struct gost28147_param _gost28147_param_CryptoPro_A =
       0x00000240, 0x00000260, 0x00000220, 0x00000228,
       0x00000278, 0x00000218, 0x00000258, 0x00000270,
     }
-  }
+  },
+  1
 };
 
 const struct gost28147_param _gost28147_param_CryptoPro_B =
@@ -1369,7 +1373,8 @@ const struct gost28147_param _gost28147_param_CryptoPro_B =
       0x00000638, 0x00000620, 0x00000668, 0x00000600,
       0x00000630, 0x00000678, 0x00000640, 0x00000670,
     }
-  }
+  },
+  1
 };
 
 const struct gost28147_param _gost28147_param_CryptoPro_C =
@@ -1636,7 +1641,8 @@ const struct gost28147_param _gost28147_param_CryptoPro_C =
       0x00000478, 0x00000418, 0x00000428, 0x00000458,
       0x00000420, 0x00000408, 0x00000460, 0x00000438,
     }
-  }
+  },
+  1
 };
 
 const struct gost28147_param _gost28147_param_CryptoPro_D =
@@ -1903,7 +1909,8 @@ const struct gost28147_param _gost28147_param_CryptoPro_D =
       0x00000768, 0x00000740, 0x00000760, 0x00000720,
       0x00000758, 0x00000750, 0x00000728, 0x00000738,
     }
-  }
+  },
+  1
 };
 
 const struct gost28147_param _gost28147_param_TC26_Z =
@@ -2170,7 +2177,8 @@ const struct gost28147_param _gost28147_param_TC26_Z =
       0x00000178, 0x00000120, 0x00000158, 0x00000100,
       0x00000168, 0x00000150, 0x00000118, 0x00000138,
     }
-  }
+  },
+  1
 };
 
 const struct gost28147_param * gost28147_get_param_test_3411 (void)

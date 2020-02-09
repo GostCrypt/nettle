@@ -33,6 +33,7 @@
 #endif
 
 #include <assert.h>
+#include <string.h>
 
 #include "macros.h"
 #include "gost28147.h"
@@ -109,6 +110,37 @@ void _gost28147_decrypt_block (const uint32_t *key, const uint32_t sbox[4][256],
   *out = l, *(out + 1) = r;
 }
 
+static const uint32_t gost28147_key_mesh_cryptopro_data[GOST28147_KEY_SIZE / 4] = {
+  0x22720069, 0x2304c964,
+  0x96db3a8d, 0xc42ae946,
+  0x94acfe18, 0x1207ed00,
+  0xc2dc86c0, 0x2ba94cef,
+};
+
+static void gost28147_key_mesh_cryptopro(struct gost28147_ctx *ctx)
+{
+  uint32_t newkey[GOST28147_KEY_SIZE/4];
+
+  _gost28147_decrypt_block(ctx->key, ctx->sbox,
+			   &gost28147_key_mesh_cryptopro_data[0],
+			   &newkey[0]);
+
+  _gost28147_decrypt_block(ctx->key, ctx->sbox,
+			   &gost28147_key_mesh_cryptopro_data[2],
+			   &newkey[2]);
+
+  _gost28147_decrypt_block(ctx->key, ctx->sbox,
+			   &gost28147_key_mesh_cryptopro_data[4],
+			   &newkey[4]);
+
+  _gost28147_decrypt_block(ctx->key, ctx->sbox,
+			   &gost28147_key_mesh_cryptopro_data[6],
+			   &newkey[6]);
+
+  memcpy(ctx->key, newkey, sizeof(newkey));
+  ctx->key_count = 0;
+}
+
 void
 gost28147_set_key(struct gost28147_ctx *ctx, const uint8_t *key)
 {
@@ -117,6 +149,7 @@ gost28147_set_key(struct gost28147_ctx *ctx, const uint8_t *key)
   assert(key);
   for (i = 0; i < 8; i++, key += 4)
     ctx->key[i] = LE_READ_UINT32(key);
+  ctx->key_count = 0;
 }
 
 void
@@ -124,6 +157,7 @@ gost28147_set_param(struct gost28147_ctx *ctx, const struct gost28147_param *par
 {
   assert(param);
   ctx->sbox = param->sbox;
+  ctx->key_meshing = param->key_meshing;
 }
 
 void
@@ -163,5 +197,32 @@ gost28147_decrypt(const struct gost28147_ctx *ctx,
       LE_WRITE_UINT32(dst, block[0]); dst += 4;
       LE_WRITE_UINT32(dst, block[1]); dst += 4;
       length -= GOST28147_BLOCK_SIZE;
+    }
+}
+
+void
+gost28147_encrypt_keymesh(struct gost28147_ctx *ctx,
+			  size_t length, uint8_t *dst,
+			  const uint8_t *src)
+{
+  uint32_t block[2];
+
+  assert(!(length % GOST28147_BLOCK_SIZE));
+
+  while (length)
+    {
+      block[0] = LE_READ_UINT32(src); src += 4;
+      block[1] = LE_READ_UINT32(src); src += 4;
+      if (ctx->key_meshing && ctx->key_count == 1024)
+	{
+	  gost28147_key_mesh_cryptopro(ctx);
+	  _gost28147_encrypt_block(ctx->key, ctx->sbox, block, block);
+	  ctx->key_count = 0;
+	}
+      _gost28147_encrypt_block(ctx->key, ctx->sbox, block, block);
+      LE_WRITE_UINT32(dst, block[0]); dst += 4;
+      LE_WRITE_UINT32(dst, block[1]); dst += 4;
+      length -= GOST28147_BLOCK_SIZE;
+      ctx->key_count += GOST28147_BLOCK_SIZE;
     }
 }

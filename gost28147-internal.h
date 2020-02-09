@@ -56,6 +56,7 @@ extern const struct gost28147_param _gost28147_param_TC26_Z;
 struct gost28147_param
 {
   uint32_t sbox[4][256];
+  int key_meshing;
 };
 
 void _gost28147_encrypt_block (const uint32_t *key, const uint32_t sbox[4][256],
