@@ -89,6 +89,12 @@ extern const struct nettle_cipher nettle_arctwo64;
 extern const struct nettle_cipher nettle_arctwo128;
 extern const struct nettle_cipher nettle_arctwo_gutmann128;
 
+extern const struct nettle_cipher nettle_gost28147_cpa;
+extern const struct nettle_cipher nettle_gost28147_cpb;
+extern const struct nettle_cipher nettle_gost28147_cpc;
+extern const struct nettle_cipher nettle_gost28147_cpd;
+extern const struct nettle_cipher nettle_gost28147_tc26z;
+
 struct nettle_hash
 {
   const char *name;

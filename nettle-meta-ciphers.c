@@ -54,6 +54,11 @@ const struct nettle_cipher * const _nettle_ciphers[] = {
   &nettle_arctwo64,
   &nettle_arctwo128,
   &nettle_arctwo_gutmann128,
+  &nettle_gost28147_cpa,
+  &nettle_gost28147_cpb,
+  &nettle_gost28147_cpc,
+  &nettle_gost28147_cpd,
+  &nettle_gost28147_tc26z,
   NULL
 };
 
