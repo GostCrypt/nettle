@@ -55,6 +55,10 @@ extern "C" {
 #define gost28147_encrypt_keymesh nettle_gost28147_encrypt_keymesh
 #define gost28147_decrypt nettle_gost28147_decrypt
 
+#define gost28147_cnt_set_key nettle_gost28147_cnt_set_key
+#define gost28147_cnt_set_iv nettle_gost28147_cnt_set_iv
+#define gost28147_cnt_crypt nettle_gost28147_cnt_crypt
+
 #define GOST28147_KEY_SIZE 32
 #define GOST28147_BLOCK_SIZE 8
 
@@ -97,6 +101,27 @@ void
 gost28147_encrypt_keymesh(struct gost28147_ctx *ctx,
 			  size_t length, uint8_t *dst,
 			  const uint8_t *src);
+
+struct gost28147_cnt_ctx {
+  struct gost28147_ctx ctx;
+  size_t bytes;
+  uint32_t iv[2];
+  uint8_t buffer[GOST28147_BLOCK_SIZE];
+};
+
+void
+gost28147_cnt_set_key(struct gost28147_cnt_ctx *ctx,
+		      const uint8_t *key,
+		      const struct gost28147_param *param);
+
+void
+gost28147_cnt_set_iv(struct gost28147_cnt_ctx *ctx,
+		     const uint8_t *iv);
+
+void
+gost28147_cnt_crypt(struct gost28147_cnt_ctx *ctx,
+		    size_t length, uint8_t *dst,
+		    const uint8_t *src);
 
 #ifdef __cplusplus
 }

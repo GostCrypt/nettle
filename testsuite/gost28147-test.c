@@ -1,6 +1,7 @@
 #include "testutils.h"
 #include "gost28147.h"
 #include "cfb.h"
+#include "macros.h"
 
 static void
 test_gost28147(const struct gost28147_param *param,
@@ -43,6 +44,82 @@ test_gost28147(const struct gost28147_param *param,
       print_hex(length, data);
       fprintf(stderr, "\nExpected:");
       tstring_print_hex(cleartext);
+      fprintf(stderr, "\n");
+      FAIL();
+    }
+
+  free(data);
+}
+
+static void
+test_gost28147_cnt(const struct gost28147_param *param,
+		   const struct tstring *key,
+		   const struct tstring *start_iv,
+		   const struct tstring *end_iv,
+		   const struct tstring *cleartext,
+		   const struct tstring *ciphertext)
+{
+  struct gost28147_cnt_ctx ctx;
+  uint8_t *data = xalloc(cleartext->length);
+  uint8_t iv[GOST28147_BLOCK_SIZE];
+  size_t length;
+
+  ASSERT (cleartext->length == ciphertext->length);
+  length = cleartext->length;
+
+  gost28147_cnt_set_key(&ctx, key->data, param);
+  gost28147_cnt_set_iv(&ctx, start_iv->data);
+  gost28147_cnt_crypt(&ctx, length, data, cleartext->data);
+
+  if (!MEMEQ(length, data, ciphertext->data))
+    {
+      fprintf(stderr, "Encrypt failed:\nInput:");
+      tstring_print_hex(cleartext);
+      fprintf(stderr, "\nOutput: ");
+      print_hex(length, data);
+      fprintf(stderr, "\nExpected:");
+      tstring_print_hex(ciphertext);
+      fprintf(stderr, "\n");
+      FAIL();
+    }
+
+  LE_WRITE_UINT32(iv + 0, ctx.iv[0]);
+  LE_WRITE_UINT32(iv + 4, ctx.iv[1]);
+
+  if (!MEMEQ(GOST28147_BLOCK_SIZE, iv, end_iv->data))
+    {
+      fprintf(stderr, "Encrypt failed IV check:\nOutput:");
+      print_hex(GOST28147_BLOCK_SIZE, iv);
+      fprintf(stderr, "\nExpected:");
+      tstring_print_hex(end_iv);
+      fprintf(stderr, "\n");
+      FAIL();
+    }
+
+  gost28147_cnt_set_key(&ctx, key->data, param);
+  gost28147_cnt_set_iv(&ctx, start_iv->data);
+  gost28147_cnt_crypt(&ctx, length, data, data);
+
+  if (!MEMEQ(length, data, cleartext->data))
+    {
+      fprintf(stderr, "Decrypt failed:\nOutput:");
+      print_hex(length, data);
+      fprintf(stderr, "\nExpected:");
+      tstring_print_hex(cleartext);
+      fprintf(stderr, "\n");
+      FAIL();
+    }
+
+  LE_WRITE_UINT32(iv + 0, ctx.iv[0]);
+  LE_WRITE_UINT32(iv + 4, ctx.iv[1]);
+
+  if (!MEMEQ(GOST28147_BLOCK_SIZE, iv, end_iv->data))
+    {
+      fprintf(stderr, "Decrypt failed IV check:\nInput:");
+      fprintf(stderr, "\nOutput: ");
+      print_hex(GOST28147_BLOCK_SIZE, iv);
+      fprintf(stderr, "\nExpected:");
+      tstring_print_hex(end_iv);
       fprintf(stderr, "\n");
       FAIL();
     }
@@ -210,4 +287,90 @@ void test_main(void)
 	   "9f846f55fb305e89 93a9f3a6a3d726bb d8a8d9951dfefcd7 a893662f04530664"
 	   "7f3129aeb79fbac4 6d68d12432f411"),
       SHEX("1f3f821e0dd81e22"));
+
+  test_gost28147_cnt(gost28147_get_param_CryptoPro_A(),
+      SHEX("599f84bac3f3d2f1 60e1e3f26a961af9 9c48b24ebcbbbf7c d8f3accd968d286a"),
+      SHEX("8dafa8d158ed058d"),
+      SHEX("f1a0e3294f65be75"),
+      SHEX("90a23966ae01b9a3 524ec8ed6cdd8830"),
+      SHEX("6e7262cce3593690 833afea91bc9bece"));
+
+  test_gost28147_cnt(gost28147_get_param_CryptoPro_A(),
+      SHEX("1b5ddb77cff9ec95 5ecc679f5d28ad4a 27f432c6b2cbb145 6a88140c9b9b5f48"),
+      SHEX("71588ce155f4f6b3"),
+      SHEX("6aeaa0a59e10e0ce"),
+      SHEX("3d0b69f7a8e4fc99 222eeed16312fea8 9dcb6c4d488ce8bd 8b60f1bf7be379d5"
+           "2b259713ef35daf4 bc77ceeae93fa4b6 01d5732958dad767 17ace4752f5723ac"
+           "9621c7622df732b5 445f72b15fba1b1e db4a098c9261a2b0 4968e5b3a28f134b"
+           "f54d84daaba0b6d1 5a6319e8a209f676 6f9b480a155db720 219a2eb96dfa1ec2"
+           "0eef15ab5901fe43 90f262ca4a9a4838 ab6f9d21b3ada760 46e3efd0e31dc5e1"
+           "b8a1e29920c576cc aa8aa94555a07800 64decf5bdf2648cd ba8ab5fbfd4ad5c4"
+           "e043a67190a48bca 2e887bacb2dcf201 cbda6e9127284488 9ad212f1a6f5b761"
+           "ce7962523ce61473 d1419250bddc3bd0 a7118c3ae42df252 d32f7c8e54904e23"
+           "aeb3a0f3257e66aa 0f6f817277bbd347 e805ffe15bc93750 334917afab1de115"
+           "f2e5985e2d051f0d 5597edff5ee00fc3 9cbd82c206be4566 ae33be2848e92d1a"
+           "e6658edf7603734b c08071f9acbaa0b0 191a0ad435128876 05758f7cb5f01975"
+           "6d05cb0dbc8de9f0 d4db3c3c298e2c32 1df7b649cfdb63ee 3cfa33736fe4974e"
+           "2fc94c5c65feeafb c6ddc11c473ff450 2fde1b5b0b16cab6 4644f2c10da11da6"
+           "dbf03db16c053185 8e74aef23926f7c1 e74cdd9d40b8f3c5 c216646baadb4b82"
+           "5cd302d38f26798d b0787019580cb431 88441c916ff45239 a8f5c01bfef20e4b"
+           "ac0ac27e9c9beb5d 4e4f42d8710a9727 031496a63d04ea9f 1414274cd9a2895f"
+           "654ae19d2cb8f8d4 8f2a5736cc069c2c c51316dffcae2216 a82b716f1db34754"
+           "3f2d0a689f2ef690 d8a12109d497b97b 7f9b6aedd1f0e3b6 28c7628200c938a1"
+           "8278ce87c853ac4f 2e31b9507f36004a 32e6d8bb59450e91 1b38a9bcb95e6c6a"
+           "9c03011cdee81f1e e3de25a25679e1bd 58c493e6d08a4d08 abf7aac37dc1ee68"
+           "37bc780b19682b2b 2e6dc46faa3bc619 cbf158b9608545ae 5297ba2432137216"
+           "6e7bc198acb1edb4 cc6ccf45fc508980 8e7aa4d364506337 c96cf1c43dfbde5a"
+           "5ca82135e62e8c2a 3c1217799a0d2e79 eb671f2bf86ecac1 fa45189edf6ae6cb"
+           "e95cc309af935813 bf90848775d68228 8de72fa3fb97742a 730482067669b10b"
+           "19fcaeb3dd2ae5c1 05d88095229071fc c29242fdf170b468 88a49e0a244013c8"
+           "a2564f39e606f1dc f5130ead9c8bafe9 e38872ffa06dda08 70b92e83c5bb32a5"
+           "74c7fb7b76af02bb 2bb85e6502fe0ea0 99ce013b35e1b022 e594bddd8ebbf675"
+           "bfbfee7ab158b481 b8393eb61ededa1b d5f7dd7d659caa56 93b8af4853c722e4"
+           "1cdfe979b42089cc 2a792c09be78cfcc f290d665c529fcda 69fcc0d67099613f"
+           "6002d81222c834c6 3bb3c233a15c8f4c d15272f242058e18 1f16dab853a15f01"
+           "321b90b3539bd085 612d17ed0aa4a527 09757cbc30f75e59 9a07968428864ba7"
+           "223528c7ed0dc3ce 98cc2decd498098e 525f2b9a13be9916 73d11f81e5a20878"
+           "cb0c20d4a5ea4b5b 955a929a52"),
+      SHEX("8ecd8fc8ace11548 2dae248ac7fbba0f 1d8a95a243efcbdc 5957a7c70ee3e2b9"
+           "0d862962cb834d07 0c40d47b2ecababf 4a603b3198c88847 d982abfc8f48e246"
+           "abd3a1ab8a05228c f4ec9a1e76ab1a60 d9256bb856e5b2ea 10f36204325eaa3b"
+           "7b57bc3b8b4347f2 d5037e5101ff7728 ca90a3fe7e2e7016 751844f01b8505ea"
+           "e321f72686763c67 9dfcbc107f77e4ed d312f883001f4b92 95925cf35af3b7d0"
+           "a95ff218c46662c1 840e66e8807d1ff0 ba019b71ae93cc27 54349abdcaee5209"
+           "929db0d5d9ba2fb9 96dcfabdceea1a7b 9a1d13a711e29a64 f6d3eec633b76eef"
+           "259e1e7ce31f2c6e a9c0f8c1bf3bf834 039ba1405b0c3c09 669d63e2e2048f06"
+           "847468b25c3b4cad 0b3f03b3078a64a7 3656263966dae96d 1bd588e85caf5a4c"
+           "49f7f5b778f0deec cd16239e8c13be6b 6f9b07e5bbcc3a1b 6f43dfff462aae47"
+           "19189a2509c92440 0c4ba7da5e0deefa 62458ecc2f23081d 92f0fe820fd71160"
+           "7e0b0b75f4f53bc0 a4e872a5b6fa5aad 5a4f39b5a212960a 3284b2a106685657"
+           "97a37b2261765d30 1a31ab9906c51a96 cfcf14ffb2c4cc2b bf0c9d918f795bbc"
+           "a96b916ab4935c7b 5dc28a75c0c108fa 99f94d5e0c066460 a9014a340f338495"
+           "6930c11c36f8fc30 23b271e5524d121a c9beeec9cb0185f3 db30f941a940b006"
+           "2977cdc5ec580248 8353446ad2ca05d8 5a08eba9f4e6c79d d57b740b31b7a557"
+           "7c7afd1a0ed79741 bfddc6196c778c18 525783ba7125ee39 bbe243a014dc0e84"
+           "b42bde3ee536b7a2 929805b896e5d08c 089335c281e0fc59 71e244495ddafb9c"
+           "aa709f43a8a5d967 d98fa31ebe0eecdf 122b6ae71c1217e7 c46d50c9527ad5e8"
+           "7fbc0715acdb9366 b1f0a77b2fe9ecd0 47695987f14c3e4b 9b117913e496f656"
+           "046e0b33fc40f6c7 c143b1bf0eb387fd 0b1c63463ad3a017 5925946c9c3d0c81"
+           "ce82724228f9376a 6de412f421aaf7fe 2755401a14c3395b bf63c25f101f1425"
+           "d0cef3144813a50b 4d38cf0d34c00a11 b4b572c84bc26fe7 9d93f7dfb843727e"
+           "da3e201fbc212ace 00fa969f3de58896 ef2984df6c1c96d8 5847aa92f307e5fb"
+           "afea957e0b71cd81 0fb70a598f314dd1 c3f32f705c591897 af77955eaf400612"
+           "816186084ebc8946 072e5b10aa12f0a7 84e29a08f1de59e3 0e474bffc3c918af"
+           "959c672ade8a7a99 04c4b8974c042971 05dab3d6db6c71e6 e803bf947dde3dc8"
+           "44fa7d62b43603ee 365264b4856dd578 f06f672d0ee02c88 9b55192940f68c12"
+           "bb2c839640c036f5 77ff708c75920bad 059b7ea2fca9d164 768213ba225e330e"
+           "2670a9be7428f5e2 c496ee3abc97a62c 2ae0648d35c61aca f492fac3f11f98e4"
+           "4388693a09bf63e5 96290b9b6223148a 95e41c5c0aa9c5b9 6f4f2b256f741e18"
+           "d5fe277d3f6e552c 67e6deb5ccc02dff c4e40621a5c8d3d6 6ca1c3fb8892b11d"
+           "90e135059b296dba f1f41e232e"));
+
+  /* Calculated manually */
+  test_gost28147_cnt(gost28147_get_param_TC26_Z(),
+      SHEX("599f84bac3f3d2f1 60e1e3f26a961af9 9c48b24ebcbbbf7c d8f3accd968d286a"),
+      SHEX("8dafa8d158ed058d"),
+      SHEX("626804b2e7ba1be2"),
+      SHEX("90a23966ae01b9a3 524ec8ed6cdd8830"),
+      SHEX("e8b14fc730dc25bb 36ba643c17dbff99"));
 }
