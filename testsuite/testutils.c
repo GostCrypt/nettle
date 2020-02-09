@@ -982,6 +982,7 @@ test_mac(const struct nettle_mac *mac,
     }
 
   /* attempt to re-use the structure */
+  mac->set_key (ctx, key->data);
   mac->update (ctx, msg->length, msg->data);
   mac->digest (ctx, digest->length, hash);
   if (!MEMEQ (digest->length, digest->data, hash))
